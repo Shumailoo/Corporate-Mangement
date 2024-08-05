@@ -1,0 +1,32 @@
+.button:hover {
+    border-color: var(--mantine-color-red-5) !important;
+    background-color: var(--mantine-color-red-5) !important;
+    color: var(--mantine-color-gray-1) !important;
+}
+
+.button.active.hyper{
+    border-color: var(--mantine-color-red-5) !important;
+    background-color: var(--mantine-color-red-5) !important;
+    color: var(--mantine-color-gray-1) !important;
+    font-weight: 700 !important;
+}
+
+.button.active {
+    color: var(--mantine-color-red-5) !important;
+    font-weight: 700 !important;
+}
+.button.active:hover {
+    color: var(--mantine-color-gray-0) !important;
+}
+
+.button.active:focus {
+    outline: none !important;
+}
+
+.button span{
+    font-size: 14px;
+}
+
+.button.heading span{
+    font-size: 18px;
+}

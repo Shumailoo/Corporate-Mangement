@@ -1,0 +1,6 @@
+.input{
+    color: var(--mantine-color-red-5);
+}
+.input input,.input select{
+    font-family: inherit;
+}

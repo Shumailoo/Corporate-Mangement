@@ -1,0 +1,11 @@
+# modules
+*/node_modules/*
+
+# package json
+*/package-lock.json
+
+# IDE
+*/.vscode/*
+
+# vite
+*/vite.config.js
