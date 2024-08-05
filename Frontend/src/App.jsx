@@ -7,7 +7,7 @@ import AppShellLayout from "./components/layout/AppShellLayout";
 import LoginPage from "./pages/AuthPages/LoginPage";
 import SignupPage from "./pages/AuthPages/SignupPage";
 import ProjectFormPage from "./pages/ProjectFormPage";
-import ViewProjectPage from "./pages/ViewProjectPage";
+import ViewProjectPage, { ProjectLoader } from "./pages/ViewProjectPage";
 import AuthLayout from "./components/layout/AuthLayout";
 import { EmployeeLoader } from "@/pages/ViewEmployeePage";
 
@@ -33,7 +33,11 @@ const router=createBrowserRouter(
                 <Route path="add-employee" element={<EmployeeFormPage />} />
             </Route>
             <Route path="projects" element={<AppShellLayout/>}>  
-                <Route index element={<ViewProjectPage />} />
+                <Route 
+                    index 
+                    element={<ViewProjectPage />} 
+                    loader={ProjectLoader}
+                />
                 <Route path="add-project" element={<ProjectFormPage />} />
             </Route>
         </Route>

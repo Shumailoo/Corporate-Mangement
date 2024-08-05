@@ -1,25 +1,36 @@
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import ProjectContext from "@/context/projectContext";
-import { Title, Table, Button, Flex, Modal, Text, Grid } from "@mantine/core";
+import { useState } from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
+// import ProjectContext from "@/context/projectContext";
+import { Title, Table, Button, Flex, Modal, Text, Grid, Pagination } from "@mantine/core";
 import ActionButton from "@/components/Buttons";
 import { IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
+import axios from "axios";
 
 const tableHead = ["Serial#", "Project Name", "Description", "Estimated Delivery Date", "Total Sprint Meetings", "Actions"];
 
 const ViewProjectPage = () => {
-    const { projects, setProjects } = useContext(ProjectContext);
+    const loadedProjects=useLoaderData();
+
+    // const { projects, setProjects } = useContext(ProjectContext);
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedProject, setSelectedProject] = useState(null);
+    const [isDeleted, setIsDeleted] = useState(false);
+
+    // pagination
+    const [activePage, setPage] = useState(1);
+    const [itemsPerPage] = useState(2);
+    const startIndex = (activePage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedProjects = loadedProjects.slice(startIndex, endIndex);
 
     const handleAdd = () => {
         navigate("add-project");
     };
 
     const handleInfo = id => {
-        const project = projects.find(p => p.id === id);
+        const project = loadedProjects.find(p => p.id === id);
         setSelectedProject(project);
         open();
     };
@@ -28,10 +39,20 @@ const ViewProjectPage = () => {
         navigate(`add-project?id=${id}`);
     };
 
-    const handleDelete = id => {
-        const newProjects = projects.filter(project => project.id !== id);
-        setProjects(newProjects);
+    const handleDelete =() => {
+        setIsDeleted(true);
     };
+
+    const deleteProject=async (id)=>{
+        const pro=loadedProjects.find(p=>(p.id===id));
+        const res=await axios.delete(`http://localhost:5101/projects/${pro.id}`);
+        if(res.status===200){
+            console.log("deleted");
+        }
+        else{
+            console.log("error");
+        }
+    }
 
     return (
         <Flex direction={"column"} align={"center"} justify={"center"} m={"0 auto"} w={"fit-content"}>
@@ -55,8 +76,8 @@ const ViewProjectPage = () => {
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                    {projects.length > 0
-                        ? projects.map((project, index) => {
+                    {paginatedProjects.length > 0
+                        ? paginatedProjects.map((project, index) => {
                             return (
                                 <Table.Tr onClick={handleInfo.bind(null, project.id)} key={project.id}>
                                     <Table.Td align="center">{index + 1}</Table.Td>
@@ -73,6 +94,12 @@ const ViewProjectPage = () => {
                         : null}
                 </Table.Tbody>
             </Table>
+            <Pagination
+                total={Math.ceil(loadedProjects.length / itemsPerPage)}
+                value={activePage}
+                onChange={setPage}
+                mt="sm"
+            />
             {selectedProject && (
                 <Modal
                     opened={opened}
@@ -149,6 +176,12 @@ const ViewProjectPage = () => {
                             </Text>
                         </Grid.Col>
                     </Grid>
+                    {isDeleted && (
+                    <Flex justify={"flex-end"} align={"center"} mt={20}>
+                        <Button variant="outline" color="red" mr={20} onClick={close}>Return</Button>
+                        <Button variant="filled" color="red" onClick={()=>deleteProject(selectedProject.id)}>Delete</Button>
+                    </Flex>
+                    )}
                 </Modal>
             )}
         </Flex>
@@ -156,3 +189,13 @@ const ViewProjectPage = () => {
 };
 
 export default ViewProjectPage;
+
+export const ProjectLoader=async()=>{
+    const res=await axios.get("http://localhost:5101/projects");
+    if(res.status===200){
+        return res.data;
+    }
+    else{
+        console.log("error");
+    }
+}

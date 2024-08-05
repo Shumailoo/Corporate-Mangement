@@ -52,6 +52,23 @@
         7,
         10
       ]
+    },
+    {
+      "id": "4",
+      "projectName": "Cloud Migration",
+      "description": "Migrating the company's infrastructure to a cloud-based solution.",
+      "deliverables": [
+        "Cloud infrastructure setup",
+        "Data migration",
+        "Security protocols"
+      ],
+      "estimatedDeliveryDate": "2025-01-20",
+      "totalSprintMeetings": 12,
+      "employeeIds": [
+        5,
+        6,
+        10
+      ]
     }
   ]
 }

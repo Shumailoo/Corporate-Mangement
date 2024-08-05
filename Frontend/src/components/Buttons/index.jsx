@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 const ActionButton=(props)=>{
     // const navigate=useNavigate();
     const email=props.email;
+    const id=props.id;
     // const {employees,setEmployees}=useContext(EmployeeContext);
 
     // const handleEdit=()=>{
@@ -23,7 +24,7 @@ const ActionButton=(props)=>{
     
     return(<Flex gap={'md'}>
         <ActionIcon variant="light" onClick={()=>{props.handleInfo(email)}}><IconEye /></ActionIcon>
-        <ActionIcon variant="outline" onClick={()=>{props.handleEdit(email)}} ><IconPencil /></ActionIcon>
+        <ActionIcon variant="outline" onClick={()=>{email?props.handleEdit(email):props.handleEdit(id)}} ><IconPencil /></ActionIcon>
         <ActionIcon  onClick={()=>{props.handleDelete(email)}}><IconTrash /></ActionIcon>
     </Flex>
     );
@@ -31,6 +32,7 @@ const ActionButton=(props)=>{
 
 ActionButton.propTypes = {
     email: PropTypes.string,
+    id: PropTypes.string,
     handleInfo:PropTypes.func,
     handleEdit:PropTypes.func,
     handleDelete:PropTypes.func,

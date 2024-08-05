@@ -1,5 +1,5 @@
-import { Title, Button, Grid, NumberInput, TextInput } from "@mantine/core";
-import { useEffect, useContext } from "react";
+import { Title, Button, Grid, NumberInput, TextInput, Flex } from "@mantine/core";
+import { useEffect, useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ProjectContext from "@/context/projectContext";
 import styles from "./styles.module.css";
@@ -10,6 +10,8 @@ const ProjectFormPage = () => {
     const location = useLocation();
     const projectId = location.search.split("=")[1];
     const { projects, setProjects } = useContext(ProjectContext);
+    const [isEditMode, setIsEditMode] = useState(false);
+
     const form = useForm({
         initialValues: {
             projectName: "",
@@ -29,10 +31,13 @@ const ProjectFormPage = () => {
 
     useEffect(() => {
         if (projectId) {
+            const projects = JSON.parse(localStorage.getItem("projects")) || [];
             const projectData = projects.find((project) => project.id === projectId);
+            
             if (projectData) {
                 form.setValues(projectData);
             }
+            setIsEditMode(true);
         }
     }, [projectId]);
 
@@ -111,9 +116,14 @@ const ProjectFormPage = () => {
                             />
                         </Grid.Col>
                         <Grid.Col span={12}>
-                            <Button className={styles.button} type="submit" mt={20} bg={"red.6"}>
-                                Submit
-                            </Button>
+                            <Flex mt={20} justify={"flex-end"} align={"center"}>
+                                {isEditMode && (
+                                        <Button mr={20} variant="outline" onClick={() => navigate("/projects")}>Return</Button>
+                                )}
+                                    <Button className={styles.button} type="submit" bg={"red.6"}>
+                                        Submit
+                                    </Button>
+                            </Flex>
                         </Grid.Col>
                     </Grid>
                 </form>

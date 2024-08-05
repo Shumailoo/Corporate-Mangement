@@ -77,10 +77,10 @@
 
 // export default ViewEmployeePage;
 
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import EmployeeContext from "@/context/employeeContext"; 
-import { Title, Table, Button, Flex, Modal, Text, Grid, Image } from "@mantine/core";
+import { useState } from "react";
+import { useLoaderData, useNavigate } from "react-router-dom";
+// import EmployeeContext from "@/context/employeeContext"; 
+import { Title, Table, Button, Flex, Modal, Text, Grid, Image, Pagination } from "@mantine/core";
 import ActionButton from "@/components/Buttons";
 import { IconUserPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -92,29 +92,53 @@ const tableHead=[
 
 
 const ViewEmployeePage = () => {
-    const { employees,setEmployees } = useContext(EmployeeContext);
+    const loadedEmployees=useLoaderData();
+    console.log(loadedEmployees);
+    
+    // const { employees,setEmployees } = useContext(EmployeeContext);
     const navigate=useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isDeleted, setIsDeleted] = useState(false);
     
+    // states for pagination
+    const [activePage, setPage] = useState(1);
+    const [itemsPerPage] = useState(4);
+    // indeces for pagination
+    const startIndex = (activePage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    //pagination sliced array
+    const paginatedEmployees = loadedEmployees.slice(startIndex, endIndex);
+
+
     const handleAdd=()=>{
         navigate("add-employee");
     }
     
     const handleInfo=(email)=>{
-        const employee = employees.find((e) => e.email === email);
+        const employee = loadedEmployees.find((e) => e.email === email);
         setSelectedEmployee(employee);
         open();
     }
 
     const handleEdit=(email)=>{
-        navigate(`add-employee?email=${email}`);
+        navigate(`add-employee?email=${email}`, {state:{}});
     };
 
     const handleDelete = () => {
         setIsDeleted(true);
     };
+
+    const deleteEmployee=async (email)=>{
+        const emp=loadedEmployees.find(e=>(e.email===email));
+        const res=await axios.delete(`http://localhost:5100/employees/${emp.id}`);
+        if(res.status===200){
+            console.log("deleted");
+        }
+        else{
+            console.log("error");
+        }
+    }
 
     return (
         <Flex direction={"column"} align={"center"} justify={"center"} m={"0 auto"} w={"max-content"}>
@@ -131,7 +155,7 @@ const ViewEmployeePage = () => {
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                    {employees.length>0 ? employees.map((employee,index) => {
+                    {paginatedEmployees.length>0 ? paginatedEmployees.map((employee,index) => {
                         return(
                             <Table.Tr onClick={handleInfo.bind(null, employee.email)} key={employee.email}>
                                 <Table.Td align="center">{index+1}</Table.Td>
@@ -152,6 +176,12 @@ const ViewEmployeePage = () => {
                     : null}
                 </Table.Tbody>
             </Table>
+            <Pagination
+                total={Math.ceil(loadedEmployees.length / itemsPerPage)}
+                value={activePage}
+                onChange={setPage}
+                mt="sm"
+            />
             {selectedEmployee && (
         <Modal opened={opened} onClose={close} size={"lg"} 
         overlayProps={{
@@ -215,13 +245,7 @@ const ViewEmployeePage = () => {
             {isDeleted && (
             <Flex justify={"flex-end"} align={"center"} mt={20}>
                 <Button variant="outline" color="red" mr={20} onClick={close}>Return</Button>
-                <Button variant="filled" color="red" onClick={() => {
-                    const newEmployees = employees.filter((employee) => employee.email !== selectedEmployee.email);
-                    setEmployees(newEmployees);
-                    console.log(newEmployees);
-                    
-                    close();
-                }}>Delete</Button>
+                <Button variant="filled" color="red" onClick={()=>deleteEmployee(selectedEmployee.email)}>Delete</Button>
             </Flex>
             )}
         </Modal>
@@ -235,8 +259,7 @@ export default ViewEmployeePage;
 export const EmployeeLoader=async()=>{
     const res=await axios.get("http://localhost:5100/employees");
     if(res.status===200){
-        console.log("ok",res.data);
-        return true;
+        return res.data;
     }
     else{
         console.log("error");
