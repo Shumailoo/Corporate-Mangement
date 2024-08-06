@@ -1,15 +1,15 @@
 import { Title, Button, Grid, NumberInput, TextInput, Flex } from "@mantine/core";
-import { useEffect, useContext, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import ProjectContext from "@/context/projectContext";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useForm } from "@mantine/form";
+import axios from "axios";
 
 const ProjectFormPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const projectId = location.search.split("=")[1];
-    const { projects, setProjects } = useContext(ProjectContext);
+    const { loadedProjects, projectEdit, activePage }=location.state;
+    const projectId = useParams("id");
     const [isEditMode, setIsEditMode] = useState(false);
 
     const form = useForm({
@@ -30,26 +30,53 @@ const ProjectFormPage = () => {
     });
 
     useEffect(() => {
-        if (projectId) {
-            const projects = JSON.parse(localStorage.getItem("projects")) || [];
-            const projectData = projects.find((project) => project.id === projectId);
-            
-            if (projectData) {
-                form.setValues(projectData);
-            }
+        if (projectEdit) {
+            form.setValues(projectEdit);
             setIsEditMode(true);
         }
     }, [projectId]);
 
-    const handleSubmit = (values) => {
-        const index = projects.findIndex((project) => project.id === projectId);
-        if (index !== -1) {
-            projects[index] = values;
-        } else {
-            projects.push(values);
+    const handleSubmit =async (values) => {
+        if(isEditMode){
+            const project={
+                "id":projectEdit.id.toString(),
+                "projectName":values.projectName,
+                "description":values.description,
+                "deliverables":values.deliverables,
+                "estimatedDeliveryDate":values.estimatedDeliveryDate,
+                "totalSprintMeetings":values.totalSprintMeetings,
+                "employeeIds":values.employeeIds,
+            }
+            const req=await axios.put("http://localhost:5101/projects/"+project.id,{...project});
+            if (req.status===200) {
+                console.log("edited success");
+            }else{
+                console.log("error");
+            }
+        }else{
+            const project={
+                "id":loadedProjects.length+1,
+                "projectName":values.projectName,
+                "description":values.description,
+                "deliverables":values.deliverables,
+                "estimatedDeliveryDate":values.estimatedDeliveryDate,
+                "totalSprintMeetings":values.totalSprintMeetings,
+                "employeeIds":values.employeeIds,
+            }
+            const req=await axios.post("http://localhost:5101/projects",{...project})
+            if(req.status===201){
+                console.log("project added");
+            }else{
+                console.log("Error");
+            }
         }
-        setProjects([...projects]);
-        navigate("/projects");
+        if(activePage){
+            navigate("/projects",{state:{
+                activePageEdit:activePage
+            }});
+        }else{
+            navigate("/projects");
+        }
     };
 
     return (
@@ -118,7 +145,16 @@ const ProjectFormPage = () => {
                         <Grid.Col span={12}>
                             <Flex mt={20} justify={"flex-end"} align={"center"}>
                                 {isEditMode && (
-                                        <Button mr={20} variant="outline" onClick={() => navigate("/projects")}>Return</Button>
+                                        <Button mr={20} variant="outline" onClick={() =>{
+                                            if(activePage){
+                                                navigate("/projects",{state:{
+                                                    activePageEdit:activePage
+                                                }});
+                                            }else{
+                                                navigate("/projects")
+                                            }
+                                        }
+                                        }>Return</Button>
                                 )}
                                     <Button className={styles.button} type="submit" bg={"red.6"}>
                                         Submit

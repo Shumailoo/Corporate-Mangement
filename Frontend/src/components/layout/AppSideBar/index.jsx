@@ -14,7 +14,7 @@ function AppSideBar() {
             path: "/employees",
             children: [
                 { label: "Manage Employees", to: "/employees" },
-                { label: "Add Employee", to: "/employees/add-employee" },
+                // { label: "Add Employee", to: "/employees/add-employee" },
             ],
         },
         {
@@ -23,7 +23,7 @@ function AppSideBar() {
             path: "/projects",
             children: [
                 { label: "Manage Projects", to: "/projects" },
-                { label: "Add Project", to: "/projects/add-project" },
+                // { label: "Add Project", to: "/projects/add-project" },
             ],
         },
     ];

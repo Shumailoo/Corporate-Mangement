@@ -1,88 +1,7 @@
-// import { useContext } from "react";
-// import { useNavigate } from "react-router-dom";
-// import EmployeeContext from "@/context/employeeContext"; 
-// import { Title,Table, Button, Flex, Modal, Text } from "@mantine/core";
-// import ActionButton from "@/components/Buttons";
-// import { IconUserPlus } from "@tabler/icons-react";
-// import { useDisclosure } from "@mantine/hooks";
-
-// const tableHead=[
-//     "Name","Email","Shift","Position","Actions"
-// ]
-
-
-// const ViewEmployeePage = () => {
-//     const { employees } = useContext(EmployeeContext);
-//     const navigate=useNavigate();
-//     const [opened, { open, close }] = useDisclosure(false);
-    
-//     const handleAdd=()=>{
-//         navigate("/add-employee");
-//     }
-    
-//     const handleInfo=(email)=>{
-//         console.log(1243);
-//         open();
-//         const employee = employees.find((e) => e.email === email);
-//         console.log(employee);
-//         return (
-//             <Modal opened={opened} onClose={close} title="Employee Info">
-//             <Flex direction="column" gap="md">
-//                 <Text weight={700}>Name:</Text>
-//                 <Text>{employee.name}</Text>
-//                 <Text weight={700}>Age:</Text>
-//                 <Text>{employee.age}</Text>
-//                 <Text weight={700}>Position:</Text>
-//                 <Text>{employee.position}</Text>
-//             </Flex>
-//             </Modal>
-//         );
-//     }
-
-//     return (
-//                 <Flex direction={"column"} align={"center"} justify={"center"}>
-//                     <Title order={1} mb={20} c={"red.7"}>Employee Table</Title>            
-//                     <Button variant="filled" mb={20} style={{width:"13%",alignSelf:"flex-end"}} onClick={handleAdd}>Add Employee<IconUserPlus size={18} /></Button>
-//                     <Table highlightOnHover withTableBorder striped border={1}>
-//                         <Table.Thead>
-//                             <Table.Tr>
-//                                 {tableHead.map((item,index)=>{
-//                                     return(
-//                                         <Table.Td key={index}>{item}</Table.Td>
-//                                     );})
-//                                 }     
-//                             </Table.Tr>
-//                         </Table.Thead>
-//                         <Table.Tbody>
-//                             {employees.length>0 ? employees.map((employee) => {
-//                                 return(
-//                                     <Table.Tr onClick={handleInfo.bind(null, employee.email)} key={employee.email}>
-//                                         <Table.Td>{employee.name}</Table.Td>
-//                                         <Table.Td>{employee.email}</Table.Td>
-//                                         <Table.Td>{employee.shift}</Table.Td>
-//                                         <Table.Td>{employee.position}</Table.Td>
-//                                         <Table.Td>
-//                                             <ActionButton email={employee.email} />
-//                                         </Table.Td>
-//                                     </Table.Tr>
-//                                 );
-//                             })
-//                             : null}
-//                         </Table.Tbody>
-//                     </Table>
-//                 </Flex>
-    
-//     );
-// };
-
-// export default ViewEmployeePage;
-
-import { useState } from "react";
-import { useLoaderData, useNavigate } from "react-router-dom";
-// import EmployeeContext from "@/context/employeeContext"; 
-import { Title, Table, Button, Flex, Modal, Text, Grid, Image, Pagination } from "@mantine/core";
-import ActionButton from "@/components/Buttons";
-import { IconUserPlus } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import { Title, Table, Button, Flex, Modal, Text, Grid, Image, Pagination, ActionIcon } from "@mantine/core";
+import { IconEye, IconPencil, IconTrash, IconUserPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 
@@ -90,13 +9,11 @@ const tableHead=[
     "Serial#","Name","Email","Shift","Position","Actions"
 ]
 
-
 const ViewEmployeePage = () => {
     const loadedEmployees=useLoaderData();
-    console.log(loadedEmployees);
-    
-    // const { employees,setEmployees } = useContext(EmployeeContext);
     const navigate=useNavigate();
+    const location=useLocation();
+    const { activePageEdit }=location.state || {};
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isDeleted, setIsDeleted] = useState(false);
@@ -110,6 +27,11 @@ const ViewEmployeePage = () => {
     //pagination sliced array
     const paginatedEmployees = loadedEmployees.slice(startIndex, endIndex);
 
+    useEffect(()=>{
+        if(activePageEdit>0){
+            setPage(activePageEdit);
+        }
+    },[activePageEdit])
 
     const handleAdd=()=>{
         navigate("add-employee");
@@ -121,8 +43,15 @@ const ViewEmployeePage = () => {
         open();
     }
 
-    const handleEdit=(email)=>{
-        navigate(`add-employee?email=${email}`, {state:{}});
+    const handleEdit=(employeeEdit)=>{
+        navigate(`add-employee?id=${employeeEdit.id}`,{ 
+            state:{
+                employeeEdit:employeeEdit,
+                loadedEmployees:loadedEmployees,
+                activePage:activePage,
+            }
+            }
+        );
     };
 
     const handleDelete = () => {
@@ -138,6 +67,7 @@ const ViewEmployeePage = () => {
         else{
             console.log("error");
         }
+        navigate("/employees")
     }
 
     return (
@@ -168,7 +98,13 @@ const ViewEmployeePage = () => {
                                 <Table.Td>{employee.shift}</Table.Td>
                                 <Table.Td>{employee.position}</Table.Td>
                                 <Table.Td>
-                                    <ActionButton email={employee.email} handleInfo={handleInfo} handleDelete={handleDelete} handleEdit={handleEdit} />
+
+                                    <Flex gap={'md'}>
+                                        <ActionIcon variant="light" onClick={()=>{handleInfo(employee.email)}}><IconEye /></ActionIcon>
+                                        <ActionIcon variant="outline" onClick={()=>{employee.id?handleEdit(employee):console.log("id");
+                                        }} ><IconPencil /></ActionIcon>
+                                        <ActionIcon  onClick={()=>{handleDelete(employee.email)}}><IconTrash /></ActionIcon>
+                                    </Flex>
                                 </Table.Td>
                             </Table.Tr>
                         );

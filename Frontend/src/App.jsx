@@ -28,7 +28,8 @@ const router=createBrowserRouter(
                 <Route 
                     index 
                     element={<ViewEmployeePage />} 
-                    loader={EmployeeLoader}    
+                    loader={EmployeeLoader} 
+                    id="employees"   
                 />
                 <Route path="add-employee" element={<EmployeeFormPage />} />
             </Route>

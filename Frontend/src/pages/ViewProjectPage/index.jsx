@@ -1,20 +1,19 @@
-import { useState } from "react";
-import { useLoaderData, useNavigate } from "react-router-dom";
-// import ProjectContext from "@/context/projectContext";
-import { Title, Table, Button, Flex, Modal, Text, Grid, Pagination } from "@mantine/core";
-import ActionButton from "@/components/Buttons";
-import { IconPlus } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import { Title, Table, Button, Flex, Modal, Text, Grid, Pagination, ActionIcon } from "@mantine/core";
+import { IconEye, IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
+import ModalCustom from "@/components/ModalCustom";
 
 const tableHead = ["Serial#", "Project Name", "Description", "Estimated Delivery Date", "Total Sprint Meetings", "Actions"];
 
 const ViewProjectPage = () => {
     const loadedProjects=useLoaderData();
-
-    // const { projects, setProjects } = useContext(ProjectContext);
     const navigate = useNavigate();
-    const [opened, { open, close }] = useDisclosure(false);
+    const location=useLocation();
+    const { activePageEdit }=location.state || {};
+    // const [opened, { open, close }] = useDisclosure(false);
     const [selectedProject, setSelectedProject] = useState(null);
     const [isDeleted, setIsDeleted] = useState(false);
 
@@ -25,6 +24,17 @@ const ViewProjectPage = () => {
     const endIndex = startIndex + itemsPerPage;
     const paginatedProjects = loadedProjects.slice(startIndex, endIndex);
 
+    useEffect(()=>{
+        if(activePageEdit>0){
+            setPage(activePageEdit);
+        }
+    },[activePageEdit])
+
+    useEffect(()=>{
+        console.log(123);
+        
+    },[selectedProject])
+
     const handleAdd = () => {
         navigate("add-project");
     };
@@ -32,11 +42,16 @@ const ViewProjectPage = () => {
     const handleInfo = id => {
         const project = loadedProjects.find(p => p.id === id);
         setSelectedProject(project);
-        open();
     };
 
-    const handleEdit = id => {
-        navigate(`add-project?id=${id}`);
+    const handleEdit = projectEdit => {
+        navigate(`add-project?id=${projectEdit.id}`,{ 
+            state:{
+                projectEdit:projectEdit,
+                loadedProjects:loadedProjects,
+                activePage:activePage,
+            }
+        });
     };
 
     const handleDelete =() => {
@@ -52,6 +67,7 @@ const ViewProjectPage = () => {
         else{
             console.log("error");
         }
+        navigate("/projects")
     }
 
     return (
@@ -86,7 +102,12 @@ const ViewProjectPage = () => {
                                     <Table.Td>{project.estimatedDeliveryDate}</Table.Td>
                                     <Table.Td>{project.totalSprintMeetings}</Table.Td>
                                     <Table.Td>
-                                        <ActionButton id={project.id} handleInfo={handleInfo} handleDelete={handleDelete} handleEdit={handleEdit} />
+                                        <Flex gap={'md'}>
+                                            <ActionIcon variant="light" onClick={()=>{handleInfo(project.id)}}><IconEye /></ActionIcon>
+                                            <ActionIcon variant="outline" onClick={()=>{project.id?handleEdit(project):console.log("id");
+                                            }} ><IconPencil /></ActionIcon>
+                                            <ActionIcon  onClick={handleDelete}><IconTrash /></ActionIcon>
+                                        </Flex>                                    
                                     </Table.Td>
                                 </Table.Tr>
                             );
@@ -101,88 +122,7 @@ const ViewProjectPage = () => {
                 mt="sm"
             />
             {selectedProject && (
-                <Modal
-                    opened={opened}
-                    onClose={close}
-                    size={"xl"}
-                    overlayProps={{
-                        backgroundOpacity: 0.55,
-                        blur: 3,
-                    }}
-                >
-
-                    <Title order={1} c={"red.7"}>
-                        {selectedProject.projectName}&apos;s Details
-                    </Title>
-                    <Grid mt={20} mb={20} columns={2} gutter="lg">
-                        <Grid.Col span={1}>
-                            <Text size="18px" style={{ fontWeight: 700 }}>
-                                Project Name:
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1} c={"red.6"}>
-                            <Text size="18px" style={{ fontWeight: 300 }}>
-                                {selectedProject.projectName}
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1}>
-                            <Text size="18px" style={{ fontWeight: 700 }}>
-                                Description:
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1} c={"red.6"}>
-                            <Text size="18px" style={{ fontWeight: 300 }}>
-                                {selectedProject.description}
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1}>
-                            <Text size="18px" style={{ fontWeight: 700 }}>
-                                Estimated Delivery Date:
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1} c={"red.6"}>
-                            <Text size="18px" style={{ fontWeight: 300 }}>
-                                {selectedProject.estimatedDeliveryDate}
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1}>
-                            <Text size="18px" style={{ fontWeight: 700 }}>
-                                Total Sprint Meetings:
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1} c={"red.6"}>
-                            <Text size="18px" style={{ fontWeight: 300 }}>
-                                {selectedProject.totalSprintMeetings}
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1}>
-                            <Text size="18px" style={{ fontWeight: 700 }}>
-                                Deliverables:
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1} c={"red.6"}>
-                            <Text size="18px" style={{ fontWeight: 300 }}>
-                                {selectedProject.deliverables.join(", ")}
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1}>
-                            <Text size="18px" style={{ fontWeight: 700 }}>
-                                Employee IDs:
-                            </Text>
-                        </Grid.Col>
-                        <Grid.Col span={1} c={"red.6"}>
-                            <Text size="18px" style={{ fontWeight: 300 }}>
-                                {selectedProject.employeeIds.join(", ")}
-                            </Text>
-                        </Grid.Col>
-                    </Grid>
-                    {isDeleted && (
-                    <Flex justify={"flex-end"} align={"center"} mt={20}>
-                        <Button variant="outline" color="red" mr={20} onClick={close}>Return</Button>
-                        <Button variant="filled" color="red" onClick={()=>deleteProject(selectedProject.id)}>Delete</Button>
-                    </Flex>
-                    )}
-                </Modal>
+                <ModalCustom selectedProject={selectedProject} isDeleted={isDeleted} key={selectedProject.id}/>
             )}
         </Flex>
     );
