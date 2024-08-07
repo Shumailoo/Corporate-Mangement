@@ -26,7 +26,7 @@ function SignUpPage() {
             <Text align="center" size="sm" color="gray" mb="lg">
                 Please enter your details to sign up
             </Text>
-            <form onSubmit={form.onSubmit((values) => console.log(values))}>
+            <form onSubmit={form.onSubmit(()=>{})}>
                 <TextInput
                     label="Name"
                     placeholder="Your name"

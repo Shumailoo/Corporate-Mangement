@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
-import { Title, Table, Button, Flex, Modal, Text, Grid, Pagination, ActionIcon } from "@mantine/core";
+import { Title, Table, Button, Flex, Pagination, ActionIcon } from "@mantine/core";
 import { IconEye, IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 import ModalCustom from "@/components/ModalCustom";
+import { useModal } from "@/customHooks/useModal";
 
 const tableHead = ["Serial#", "Project Name", "Description", "Estimated Delivery Date", "Total Sprint Meetings", "Actions"];
 
@@ -13,10 +13,7 @@ const ViewProjectPage = () => {
     const navigate = useNavigate();
     const location=useLocation();
     const { activePageEdit }=location.state || {};
-    // const [opened, { open, close }] = useDisclosure(false);
-    const [selectedProject, setSelectedProject] = useState(null);
-    const [isDeleted, setIsDeleted] = useState(false);
-
+    const { isOpen, content, openModal, closeModal } = useModal();
     // pagination
     const [activePage, setPage] = useState(1);
     const [itemsPerPage] = useState(2);
@@ -30,22 +27,22 @@ const ViewProjectPage = () => {
         }
     },[activePageEdit])
 
-    useEffect(()=>{
-        console.log(123);
-        
-    },[selectedProject])
 
     const handleAdd = () => {
-        navigate("add-project");
+        navigate("add-project",{replace:true});
     };
 
     const handleInfo = id => {
         const project = loadedProjects.find(p => p.id === id);
-        setSelectedProject(project);
+        openModal({
+            type:"info",
+            data:project,
+            contentType:"project",
+        })
     };
 
     const handleEdit = projectEdit => {
-        navigate(`add-project?id=${projectEdit.id}`,{ 
+        navigate(`add-project?id=${projectEdit.id}`,{replace:true},{ 
             state:{
                 projectEdit:projectEdit,
                 loadedProjects:loadedProjects,
@@ -54,20 +51,29 @@ const ViewProjectPage = () => {
         });
     };
 
-    const handleDelete =() => {
-        setIsDeleted(true);
+    const handleDelete =(project) => {
+        openModal({
+            type:"delete",
+            data:project,
+            contentType:"project",
+        })
     };
 
     const deleteProject=async (id)=>{
-        const pro=loadedProjects.find(p=>(p.id===id));
-        const res=await axios.delete(`http://localhost:5101/projects/${pro.id}`);
-        if(res.status===200){
-            console.log("deleted");
+        try {
+            const res=await axios.delete(`http://localhost:5101/projects/${id}`);
+            if(res.status===200){
+                console.log("deleted project success");
+            }
+            else{
+                console.log("error project add");
+            }
+            navigate("/projects",{replace:true})
+        } catch (error) {
+            console.log(error);
+        } finally{
+            closeModal();
         }
-        else{
-            console.log("error");
-        }
-        navigate("/projects")
     }
 
     return (
@@ -95,18 +101,24 @@ const ViewProjectPage = () => {
                     {paginatedProjects.length > 0
                         ? paginatedProjects.map((project, index) => {
                             return (
-                                <Table.Tr onClick={handleInfo.bind(null, project.id)} key={project.id}>
-                                    <Table.Td align="center">{index + 1}</Table.Td>
-                                    <Table.Td>{project.projectName}</Table.Td>
-                                    <Table.Td style={{ wordBreak: 'break-word' }}>{project.description}</Table.Td>
-                                    <Table.Td>{project.estimatedDeliveryDate}</Table.Td>
-                                    <Table.Td>{project.totalSprintMeetings}</Table.Td>
+                                <Table.Tr key={project.id}>
+                                    <Table.Td onClick={handleInfo.bind(null, project.id)}  align="center">{index + 1}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project.id)} >{project.projectName}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project.id)}  style={{ wordBreak: 'break-word' }}>{project.description}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project.id)} >{project.estimatedDeliveryDate}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project.id)} >{project.totalSprintMeetings}</Table.Td>
                                     <Table.Td>
                                         <Flex gap={'md'}>
-                                            <ActionIcon variant="light" onClick={()=>{handleInfo(project.id)}}><IconEye /></ActionIcon>
-                                            <ActionIcon variant="outline" onClick={()=>{project.id?handleEdit(project):console.log("id");
-                                            }} ><IconPencil /></ActionIcon>
-                                            <ActionIcon  onClick={handleDelete}><IconTrash /></ActionIcon>
+                                            <ActionIcon variant="light" onClick={()=>{handleInfo(project.id)}}>
+                                                <IconEye />
+                                            </ActionIcon>
+                                            <ActionIcon variant="outline" onClick={()=>{project.id?handleEdit(project):void 0;
+                                            }} >
+                                                <IconPencil />
+                                            </ActionIcon>
+                                            <ActionIcon onClick={()=>{handleDelete(project)}}>
+                                                <IconTrash />
+                                            </ActionIcon>
                                         </Flex>                                    
                                     </Table.Td>
                                 </Table.Tr>
@@ -121,8 +133,8 @@ const ViewProjectPage = () => {
                 onChange={setPage}
                 mt="sm"
             />
-            {selectedProject && (
-                <ModalCustom selectedProject={selectedProject} isDeleted={isDeleted} key={selectedProject.id}/>
+            {isOpen && (
+                <ModalCustom content={content} onDelete={deleteProject} onClose={closeModal}/>
             )}
         </Flex>
     );
@@ -136,6 +148,6 @@ export const ProjectLoader=async()=>{
         return res.data;
     }
     else{
-        console.log("error");
+        console.log("error fetch project");
     }
 }

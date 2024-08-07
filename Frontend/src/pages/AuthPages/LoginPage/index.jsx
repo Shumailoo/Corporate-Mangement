@@ -22,7 +22,7 @@ function LoginPage() {
             <Text align="center" size="sm" color="gray" mb="lg">
                 Please enter your details to sign in
             </Text>
-            <form onSubmit={form.onSubmit((values) => console.log(values))}>
+            <form onSubmit={form.onSubmit(() => {})}>
                 <TextInput
                     label="Email"
                     placeholder="your@email.com"

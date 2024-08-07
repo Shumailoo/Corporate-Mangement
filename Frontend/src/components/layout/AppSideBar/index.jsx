@@ -32,9 +32,9 @@ function AppSideBar() {
         <>
             {links.map((link)=>{
                 return(
-                    <>
+                    <Fragment key={link.key}>
                         <Box fz={"xl"} mt={20} pl={15} py={8} key={link.key}
-                        className={`${styles.button} ${styles.heading} ${
+                        className={`${styles.button} ${
                             location.pathname.startsWith(link.path) ? `${styles.active}` : ""}`}
                         >
                             {link.key === "employees" ? (
@@ -46,7 +46,6 @@ function AppSideBar() {
                             {link.label}
                         </Box>
                         {link.children.map((child,index)=>{
-                            // console.log(link.key, child.label, index);
                             return(
                                 <Fragment key={`${link.key}-${child.label}-${index}`}>
                                 <Box py={7} fz={"md"} mt={15} pl={35}
@@ -59,7 +58,7 @@ function AppSideBar() {
                                 </Fragment>
                             );
                         })}
-                    </>
+                    </Fragment>
                 );
             })}
         </>

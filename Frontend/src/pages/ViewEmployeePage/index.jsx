@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
-import { Title, Table, Button, Flex, Modal, Text, Grid, Image, Pagination, ActionIcon } from "@mantine/core";
+import { Title, Table, Button, Flex, Image, Pagination, ActionIcon } from "@mantine/core";
 import { IconEye, IconPencil, IconTrash, IconUserPlus } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
+import ModalCustom from "@/components/ModalCustom";
+import { useModal } from "@/customHooks/useModal";
 
 const tableHead=[
     "Serial#","Name","Email","Shift","Position","Actions"
@@ -13,10 +14,8 @@ const ViewEmployeePage = () => {
     const loadedEmployees=useLoaderData();
     const navigate=useNavigate();
     const location=useLocation();
-    const { activePageEdit }=location.state || {};
-    const [opened, { open, close }] = useDisclosure(false);
-    const [selectedEmployee, setSelectedEmployee] = useState(null);
-    const [isDeleted, setIsDeleted] = useState(false);
+    const { activePageEdit }=location?.state || {};
+    const { isOpen, content, openModal, closeModal } = useModal();
     
     // states for pagination
     const [activePage, setPage] = useState(1);
@@ -27,47 +26,60 @@ const ViewEmployeePage = () => {
     //pagination sliced array
     const paginatedEmployees = loadedEmployees.slice(startIndex, endIndex);
 
-    useEffect(()=>{
-        if(activePageEdit>0){
-            setPage(activePageEdit);
-        }
-    },[activePageEdit])
+    // useEffect(()=>{
+    //     if(activePageEdit>0){
+    //         setPage(activePageEdit);
+    //     }
+    // },[activePageEdit])
 
     const handleAdd=()=>{
         navigate("add-employee");
     }
     
-    const handleInfo=(email)=>{
-        const employee = loadedEmployees.find((e) => e.email === email);
-        setSelectedEmployee(employee);
-        open();
+    const handleInfo=(employee)=>{
+        openModal({
+            type:"info",
+            data:employee,
+            contentType:"employee",
+        })
     }
 
     const handleEdit=(employeeEdit)=>{
+        setPage(activePage);
         navigate(`add-employee?id=${employeeEdit.id}`,{ 
             state:{
                 employeeEdit:employeeEdit,
                 loadedEmployees:loadedEmployees,
-                activePage:activePage,
+                // activePage:activePage,
             }
             }
         );
     };
 
-    const handleDelete = () => {
-        setIsDeleted(true);
+    const handleDelete = (employee) => {
+        openModal({
+            type:"delete",
+            data:employee,
+            contentType:"employee",
+        })
     };
 
-    const deleteEmployee=async (email)=>{
-        const emp=loadedEmployees.find(e=>(e.email===email));
-        const res=await axios.delete(`http://localhost:5100/employees/${emp.id}`);
-        if(res.status===200){
-            console.log("deleted");
+    const deleteEmployee=async (id)=>{
+        try {
+            const req=await axios.delete(`http://localhost:5100/employees/${id}`);
+            if(req.status===200){
+                // setEmployees((prevEmployees)=>{prevEmployees.filter(employee => employee.id !== id)});
+                console.log("employee deleted");
+            }
+            else{
+                console.log("employee delete error");
+            }
+            navigate("/employees",{replace:true})
+        } catch (error) {
+            console.log(error);
+        }finally{
+            closeModal();
         }
-        else{
-            console.log("error");
-        }
-        navigate("/employees")
     }
 
     return (
@@ -87,23 +99,23 @@ const ViewEmployeePage = () => {
                 <Table.Tbody>
                     {paginatedEmployees.length>0 ? paginatedEmployees.map((employee,index) => {
                         return(
-                            <Table.Tr onClick={handleInfo.bind(null, employee.email)} key={employee.email}>
-                                <Table.Td align="center">{index+1}</Table.Td>
-                                <Table.Td>
+                            <Table.Tr key={employee.email}>
+                                <Table.Td onClick={handleInfo.bind(null, employee)}  align="center">{index+1}</Table.Td>
+                                <Table.Td onClick={handleInfo.bind(null, employee)} >
                                     <Flex align={"center"}>
                                         <Image mr={10} src="/src/assets/employeesProfile/empl_profile.png" h={40} w={40} fit="contain" />{employee.name}
                                     </Flex>
                                 </Table.Td>
-                                <Table.Td>{employee.email}</Table.Td>
-                                <Table.Td>{employee.shift}</Table.Td>
-                                <Table.Td>{employee.position}</Table.Td>
+                                <Table.Td onClick={handleInfo.bind(null, employee)} >{employee.email}</Table.Td>
+                                <Table.Td onClick={handleInfo.bind(null, employee)} >{employee.shift}</Table.Td>
+                                <Table.Td onClick={handleInfo.bind(null, employee)} >{employee.position}</Table.Td>
                                 <Table.Td>
 
                                     <Flex gap={'md'}>
-                                        <ActionIcon variant="light" onClick={()=>{handleInfo(employee.email)}}><IconEye /></ActionIcon>
-                                        <ActionIcon variant="outline" onClick={()=>{employee.id?handleEdit(employee):console.log("id");
+                                        <ActionIcon variant="light" onClick={()=>{handleInfo(employee)}}><IconEye /></ActionIcon>
+                                        <ActionIcon variant="outline" onClick={()=>{employee.id?handleEdit(employee):void 0;
                                         }} ><IconPencil /></ActionIcon>
-                                        <ActionIcon  onClick={()=>{handleDelete(employee.email)}}><IconTrash /></ActionIcon>
+                                        <ActionIcon onClick={()=>{handleDelete(employee)}}><IconTrash /></ActionIcon>
                                     </Flex>
                                 </Table.Td>
                             </Table.Tr>
@@ -118,74 +130,10 @@ const ViewEmployeePage = () => {
                 onChange={setPage}
                 mt="sm"
             />
-            {selectedEmployee && (
-        <Modal opened={opened} onClose={close} size={"lg"} 
-        overlayProps={{
-            backgroundOpacity: 0.55,
-            blur: 3,
-        }}>
-            <Flex align={"end"}>
-                <Image w={100} h={100} src={"/src/assets/employeesProfile/empl_profile.png"} mr={20}/>
-                <Title order={1} c={"red.7"}>{selectedEmployee.name}&apos;s Details</Title>
-            </Flex>
-            <Grid mt={20} mb={20} columns={2} gutter="lg">
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Name:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.name}</Text>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Age:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.age}</Text>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Position:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.position}</Text>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Working Months:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.workingMonths}</Text>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Shift:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.shift}</Text>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Email:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.email}</Text>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Department:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.department}</Text>
-                </Grid.Col>
-                <Grid.Col span={1}>
-                    <Text size="18px" style={{ fontWeight: 700 }}>Location:</Text>
-                </Grid.Col>
-                <Grid.Col span={1} c={"red.6"}>
-                    <Text size="18px" style={{ fontWeight: 300 }}>{selectedEmployee.location}</Text>
-                </Grid.Col>
-            </Grid>
-            {isDeleted && (
-            <Flex justify={"flex-end"} align={"center"} mt={20}>
-                <Button variant="outline" color="red" mr={20} onClick={close}>Return</Button>
-                <Button variant="filled" color="red" onClick={()=>deleteEmployee(selectedEmployee.email)}>Delete</Button>
-            </Flex>
+            {isOpen && (
+                <ModalCustom content={content} onDelete={deleteEmployee} onClose={closeModal}/>
             )}
-        </Modal>
-            )}
+            
         </Flex>
     );
 };
@@ -198,7 +146,7 @@ export const EmployeeLoader=async()=>{
         return res.data;
     }
     else{
-        console.log("error");
+        console.log("error fetch employee");
     }
 }
 

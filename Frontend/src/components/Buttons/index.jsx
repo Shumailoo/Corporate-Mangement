@@ -9,7 +9,7 @@ const ActionButton=(props)=>{
     
     return(<Flex gap={'md'}>
         <ActionIcon variant="light" onClick={()=>{props.handleInfo(email)}}><IconEye /></ActionIcon>
-        <ActionIcon variant="outline" onClick={()=>{id?props.handleEdit(id):console.log("id");
+        <ActionIcon variant="outline" onClick={()=>{id?props.handleEdit(id):void 0;
         }} ><IconPencil /></ActionIcon>
         <ActionIcon  onClick={()=>{props.handleDelete(email)}}><IconTrash /></ActionIcon>
     </Flex>

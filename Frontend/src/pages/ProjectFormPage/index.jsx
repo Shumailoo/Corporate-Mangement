@@ -8,7 +8,7 @@ import axios from "axios";
 const ProjectFormPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { loadedProjects, projectEdit, activePage }=location.state;
+    const { loadedProjects, projectEdit, activePage }=location?.state || {};
     const projectId = useParams("id");
     const [isEditMode, setIsEditMode] = useState(false);
 
@@ -49,9 +49,9 @@ const ProjectFormPage = () => {
             }
             const req=await axios.put("http://localhost:5101/projects/"+project.id,{...project});
             if (req.status===200) {
-                console.log("edited success");
+                console.log("edited project success");
             }else{
-                console.log("error");
+                console.log("error project");
             }
         }else{
             const project={
@@ -67,7 +67,7 @@ const ProjectFormPage = () => {
             if(req.status===201){
                 console.log("project added");
             }else{
-                console.log("Error");
+                console.log("Error add project");
             }
         }
         if(activePage){
@@ -147,11 +147,11 @@ const ProjectFormPage = () => {
                                 {isEditMode && (
                                         <Button mr={20} variant="outline" onClick={() =>{
                                             if(activePage){
-                                                navigate("/projects",{state:{
+                                                navigate("/projects",{replace:true},{state:{
                                                     activePageEdit:activePage
                                                 }});
                                             }else{
-                                                navigate("/projects")
+                                                navigate("/projects",{replace:true})
                                             }
                                         }
                                         }>Return</Button>

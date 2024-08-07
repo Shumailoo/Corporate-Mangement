@@ -26,10 +26,10 @@ const router=createBrowserRouter(
             </Route>
             <Route path="employees" element={<AppShellLayout/>}>  
                 <Route 
-                    index 
+                    index
                     element={<ViewEmployeePage />} 
                     loader={EmployeeLoader} 
-                    id="employees"   
+                    id="employees"
                 />
                 <Route path="add-employee" element={<EmployeeFormPage />} />
             </Route>
@@ -44,6 +44,7 @@ const router=createBrowserRouter(
         </Route>
     )
 )
+
 
 function App() {
     return (

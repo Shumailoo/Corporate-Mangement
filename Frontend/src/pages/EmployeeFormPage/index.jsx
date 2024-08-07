@@ -12,7 +12,8 @@ const EmployeeFormPage = () => {
     // const { state}=location;
     const id = useParams("id");
     const [isEditMode, setIsEditMode] = useState(false);
-
+    console.log(12,loadedEmployees);
+    
     const form = useForm({
         validateInputOnChange: true,
         initialValues: {
@@ -29,7 +30,7 @@ const EmployeeFormPage = () => {
             name: value => value.length>2?null:'Invalid Name',
             email: value => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
             age: value => (value?.length == 0 || value >= 18 ? null : "Age must be greater than 18"),
-            workingMonths: value => (value > 0 ? null : "Working months must be greater than 0"),
+            workingMonths: value => (value?.length==0||value > 0 ? null : "Working months must be greater than 0"),
         },
     });
 
@@ -40,7 +41,7 @@ const EmployeeFormPage = () => {
         }
     }, [id]);
 
-    const handleSubmit = async values => {
+    const handleSubmit = async (values) => {
         if (isEditMode) {
             const employee = {
                 id: employeeEdit.id,
@@ -55,13 +56,14 @@ const EmployeeFormPage = () => {
             };
             const req = await axios.put("http://localhost:5100/employees/" + employee.id, { ...employee });
             if (req.status === 200) {
-                console.log("edited success");
+                console.log("edited employee success");
             } else {
-                console.log("error");
+                console.log("edit employee error");
             }
         } else {
+            
             const employee = {
-                id: loadedEmployees.length + 1,
+                id: 6,
                 name: values.name,
                 age: values.age,
                 position: values.position,
@@ -75,18 +77,10 @@ const EmployeeFormPage = () => {
             if (req.status === 201) {
                 console.log("Employee added");
             } else {
-                console.log("Error");
+                console.log("employee added error");
             }
         }
-        if (activePage) {
-            navigate("/employees", {
-                state: {
-                    activePageEdit: activePage,
-                },
-            });
-        } else {
-            navigate("/employees");
-        }
+        navigate("/employees");
     };
 
     return (
@@ -97,7 +91,10 @@ const EmployeeFormPage = () => {
                 </Title>
             </Grid.Col>
             <Grid.Col span={12}>
-                <form onSubmit={form.onSubmit(handleSubmit)}>
+                <form onSubmit={form.onSubmit((values,event)=>{
+                    event.preventDefault();
+                    handleSubmit(values);
+                })}>
                     <Grid gutter="lg">
                         <Grid.Col span={6}>
                             <TextInput withAsterisk placeholder="Enter your name" className={styles.input} label="Name" {...form.getInputProps("name")} />
@@ -154,13 +151,13 @@ const EmployeeFormPage = () => {
                                         variant="outline"
                                         onClick={() => {
                                             if (activePage) {
-                                                navigate("/employees", {
+                                                navigate("/employees",{replace:true}, {
                                                     state: {
                                                         activePageEdit: activePage,
                                                     },
                                                 });
                                             } else {
-                                                navigate("/employees");
+                                                navigate("/employees",{replace:true});
                                             }
                                         }}
                                     >
