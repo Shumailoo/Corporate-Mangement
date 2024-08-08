@@ -20,7 +20,7 @@
     },
     {
       "id": "2",
-      "projectName": "Mobile App Development",
+      "projectName": "Mobile App Developmen",
       "description": "Development of a mobile app for the company's new service offerings.",
       "deliverables": [
         "Mobile app (iOS and Android)",
@@ -38,20 +38,13 @@
       ]
     },
     {
-      "id": "3",
-      "projectName": "HR Management System",
-      "description": "Implementation of a new HR management system to streamline internal processes.",
-      "deliverables": [
-        "HR system implementation",
-        "Employee portal",
-        "Payroll integration"
-      ],
-      "estimatedDeliveryDate": "2024-11-30",
-      "totalSprintMeetings": 8,
-      "employeeIds": [
-        7,
-        10
-      ]
+      "id": 3,
+      "projectName": "fdsfn",
+      "description": "",
+      "deliverables": [],
+      "estimatedDeliveryDate": "2024-08-05",
+      "totalSprintMeetings": "",
+      "employeeIds": []
     }
   ]
 }

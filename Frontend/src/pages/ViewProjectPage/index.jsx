@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate, useSearchParams } from "react-router-dom";
 import { Title, Table, Button, Flex, Pagination, ActionIcon } from "@mantine/core";
 import { IconEye, IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 import axios from "axios";
@@ -9,31 +9,24 @@ import { useModal } from "@/customHooks/useModal";
 const tableHead = ["Serial#", "Project Name", "Description", "Estimated Delivery Date", "Total Sprint Meetings", "Actions"];
 
 const ViewProjectPage = () => {
-    const loadedProjects=useLoaderData();
+    const { loadedProjects,total }=useLoaderData();
     const navigate = useNavigate();
-    const location=useLocation();
-    const { activePageEdit }=location.state || {};
     const { isOpen, content, openModal, closeModal } = useModal();
     // pagination
-    const [activePage, setPage] = useState(1);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [activePage, setPage] = useState(parseInt(searchParams.get("page")) || 1);
     const [itemsPerPage] = useState(2);
-    const startIndex = (activePage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedProjects = loadedProjects.slice(startIndex, endIndex);
 
-    useEffect(()=>{
-        if(activePageEdit>0){
-            setPage(activePageEdit);
-        }
-    },[activePageEdit])
 
+    useEffect(() => {
+        setSearchParams({ page: activePage });
+    }, [activePage, setSearchParams]);
 
     const handleAdd = () => {
-        navigate("add-project",{replace:true});
+        navigate("add-project",{state:{newId:loadedProjects.length+1}});
     };
 
-    const handleInfo = id => {
-        const project = loadedProjects.find(p => p.id === id);
+    const handleInfo = project => {
         openModal({
             type:"info",
             data:project,
@@ -42,13 +35,13 @@ const ViewProjectPage = () => {
     };
 
     const handleEdit = projectEdit => {
-        navigate(`add-project?id=${projectEdit.id}`,{replace:true},{ 
+        navigate(`add-project?id=${projectEdit.id}`,{ 
             state:{
                 projectEdit:projectEdit,
                 loadedProjects:loadedProjects,
-                activePage:activePage,
             }
         });
+        setPage(activePage);
     };
 
     const handleDelete =(project) => {
@@ -98,18 +91,18 @@ const ViewProjectPage = () => {
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                    {paginatedProjects.length > 0
-                        ? paginatedProjects.map((project, index) => {
+                    {loadedProjects.length > 0
+                        ? loadedProjects.map((project, index) => {
                             return (
                                 <Table.Tr key={project.id}>
-                                    <Table.Td onClick={handleInfo.bind(null, project.id)}  align="center">{index + 1}</Table.Td>
-                                    <Table.Td onClick={handleInfo.bind(null, project.id)} >{project.projectName}</Table.Td>
-                                    <Table.Td onClick={handleInfo.bind(null, project.id)}  style={{ wordBreak: 'break-word' }}>{project.description}</Table.Td>
-                                    <Table.Td onClick={handleInfo.bind(null, project.id)} >{project.estimatedDeliveryDate}</Table.Td>
-                                    <Table.Td onClick={handleInfo.bind(null, project.id)} >{project.totalSprintMeetings}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project)}  align="center">{index + 1}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project)} >{project.projectName}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project)}  style={{ wordBreak: 'break-word' }}>{project.description}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project)} >{project.estimatedDeliveryDate}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project)} >{project.totalSprintMeetings}</Table.Td>
                                     <Table.Td>
                                         <Flex gap={'md'}>
-                                            <ActionIcon variant="light" onClick={()=>{handleInfo(project.id)}}>
+                                            <ActionIcon variant="light" onClick={()=>{handleInfo(project)}}>
                                                 <IconEye />
                                             </ActionIcon>
                                             <ActionIcon variant="outline" onClick={()=>{project.id?handleEdit(project):void 0;
@@ -128,7 +121,7 @@ const ViewProjectPage = () => {
                 </Table.Tbody>
             </Table>
             <Pagination
-                total={Math.ceil(loadedProjects.length / itemsPerPage)}
+                total={Math.ceil(total / itemsPerPage)}
                 value={activePage}
                 onChange={setPage}
                 mt="sm"
@@ -142,10 +135,16 @@ const ViewProjectPage = () => {
 
 export default ViewProjectPage;
 
-export const ProjectLoader=async()=>{
-    const res=await axios.get("http://localhost:5101/projects");
+export const ProjectLoader=async({request})=>{
+    const url = new URL(request.url);
+    const page = url.searchParams.get("page") || 1;
+    const perPage = 2;
+    const res=await axios.get(`http://localhost:5101/projects?_page=${page}&_per_page=${perPage}`);
     if(res.status===200){
-        return res.data;
+        return {
+            loadedProjects: res.data.data,
+            total: res.data.items,
+        };
     }
     else{
         console.log("error fetch project");

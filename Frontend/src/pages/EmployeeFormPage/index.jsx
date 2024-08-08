@@ -8,11 +8,10 @@ import axios from "axios";
 const EmployeeFormPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { loadedEmployees, employeeEdit, activePage } = location?.state || {};
+    const { newId, employeeEdit, activePage } = location?.state || {};
     // const { state}=location;
     const id = useParams("id");
     const [isEditMode, setIsEditMode] = useState(false);
-    console.log(12,loadedEmployees);
     
     const form = useForm({
         validateInputOnChange: true,
@@ -61,9 +60,8 @@ const EmployeeFormPage = () => {
                 console.log("edit employee error");
             }
         } else {
-            
             const employee = {
-                id: 6,
+                id: newId.toString(),
                 name: values.name,
                 age: values.age,
                 position: values.position,

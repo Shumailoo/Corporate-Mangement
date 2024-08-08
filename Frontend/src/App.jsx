@@ -10,6 +10,8 @@ import ProjectFormPage from "./pages/ProjectFormPage";
 import ViewProjectPage, { ProjectLoader } from "./pages/ViewProjectPage";
 import AuthLayout from "./components/layout/AuthLayout";
 import { EmployeeLoader } from "@/pages/ViewEmployeePage";
+import {UsersLoader} from "@/pages/AuthPages/SignupPage"
+import { AuthContextProvider } from "./context/AuthContext";
 
 
 const theme = createTheme({
@@ -21,8 +23,16 @@ const router=createBrowserRouter(
     createRoutesFromElements(
         <Route>
             <Route path="/" element={<AuthLayout />}>  
-                <Route path="login" element={<LoginPage />} />
-                <Route path="signup" element={<SignupPage />} />
+                <Route 
+                    path="login" 
+                    element={<LoginPage />} 
+                    loader={UsersLoader}
+                />
+                <Route
+                    path="signup" 
+                    element={<SignupPage />} 
+                    loader={UsersLoader}
+                />
             </Route>
             <Route path="employees" element={<AppShellLayout/>}>  
                 <Route 
@@ -49,7 +59,9 @@ const router=createBrowserRouter(
 function App() {
     return (
         <MantineProvider theme={theme}>
-            <RouterProvider router={router} />
+            <AuthContextProvider>
+                <RouterProvider router={router} />
+            </AuthContextProvider>
         </MantineProvider>
     );
 }
