@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { useLoaderData, useNavigate, useSearchParams } from "react-router-dom";
-import { Title, Table, Button, Flex, Pagination, ActionIcon } from "@mantine/core";
+import { Title, Table, Button, Flex, Pagination, ActionIcon, LoadingOverlay } from "@mantine/core";
 import { IconEye, IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
 import axios from "axios";
 import ModalCustom from "@/components/ModalCustom";
 import { useModal } from "@/customHooks/useModal";
+import { useDisclosure } from "@mantine/hooks";
 
 const tableHead = ["Serial#", "Project Name", "Description", "Estimated Delivery Date", "Total Sprint Meetings", "Actions"];
 
 const ViewProjectPage = () => {
+    const [visible, { open,close }] = useDisclosure(false);
     const { loadedProjects,total }=useLoaderData();
     const navigate = useNavigate();
     const { isOpen, content, openModal, closeModal } = useModal();
@@ -53,6 +55,8 @@ const ViewProjectPage = () => {
     };
 
     const deleteProject=async (id)=>{
+        open();
+        console.log(45,visible);
         try {
             const res=await axios.delete(`http://localhost:5101/projects/${id}`);
             if(res.status===200){
@@ -65,12 +69,14 @@ const ViewProjectPage = () => {
         } catch (error) {
             console.log(error);
         } finally{
+            close();
             closeModal();
         }
     }
 
     return (
         <Flex direction={"column"} align={"center"} justify={"center"} m={"0 auto"} w={"fit-content"}>
+            <LoadingOverlay visible={visible} loaderProps={{type:"oval"}} />
             <Title order={1} mb={20} c={"red.7"}>
                 Project Table
             </Title>
@@ -95,7 +101,7 @@ const ViewProjectPage = () => {
                         ? loadedProjects.map((project, index) => {
                             return (
                                 <Table.Tr key={project.id}>
-                                    <Table.Td onClick={handleInfo.bind(null, project)}  align="center">{index + 1}</Table.Td>
+                                    <Table.Td onClick={handleInfo.bind(null, project)}  align="center">{activePage==1?index+1:((activePage-1)*itemsPerPage)+index+1}</Table.Td>
                                     <Table.Td onClick={handleInfo.bind(null, project)} >{project.projectName}</Table.Td>
                                     <Table.Td onClick={handleInfo.bind(null, project)}  style={{ wordBreak: 'break-word' }}>{project.description}</Table.Td>
                                     <Table.Td onClick={handleInfo.bind(null, project)} >{project.estimatedDeliveryDate}</Table.Td>

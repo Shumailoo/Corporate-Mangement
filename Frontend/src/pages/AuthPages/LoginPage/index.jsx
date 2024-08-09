@@ -1,11 +1,15 @@
-import { Container, Text, Button, Group, PasswordInput, TextInput, Anchor, Divider } from "@mantine/core";
+import { Container, Text, Button, Group, PasswordInput, TextInput, Anchor, Divider, LoadingOverlay } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconAt, IconBrandFacebookFilled, IconBrandGoogleFilled, IconBrandX, IconLock } from "@tabler/icons-react";
 import { useLoaderData, useNavigate } from "react-router-dom";
-// import { AuthContext } from "@/context/AuthContext";
-// import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
+import { useContext } from "react";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 
 function LoginPage() {
+  const [visible, { open,close }] = useDisclosure(false);
+  const {isAuthenticated,login}=useContext(AuthContext);
   const { loadedUsers }=useLoaderData();
   const navigate=useNavigate();
   const form = useForm({
@@ -21,16 +25,40 @@ function LoginPage() {
   });
 
   const handleSubmit=(values)=>{
-    const user=loadedUsers.find(user=>user.email===values.email && user.password===values.password);
-    if(user){
-      navigate("/employees",{replace:true});
+    open();
+    if(!isAuthenticated){
+      const user=loadedUsers.find(user=>user.email===values.email && user.password===values.password);
+      if(!user){
+        notifications.show({
+          title:"Authentication Failed",
+          message:"We couldn't verify your account. Check your email and password and try again.",
+          autoClose:1800,
+        })
+        close();
+        form.reset();
+        return navigate("/login",{replace:true});
+      }
+      login({
+        userName:user.name,
+        // userId:user.id,
+        userEmail:user.email,
+      })
     }else{
-      alert('User not found');
+      alert('User already logged in');
     }
+    notifications.show({
+      title:"Welcome Back!",
+      message:"We're delighted to see you again! You're all set to shine.",
+      autoClose:1800,
+      color:"green"
+    })
+    close();
+    navigate("/employees",{replace:true});
   }
 
   return (
-    <Container size="sm" py="xl">
+    <Container size="lg" w={350} py="xl">
+      <LoadingOverlay visible={visible} loaderProps={{type:"oval"}} />
       <Text align="center" size="xl" weight="bold" mb="md">
         Welcome back!
       </Text>

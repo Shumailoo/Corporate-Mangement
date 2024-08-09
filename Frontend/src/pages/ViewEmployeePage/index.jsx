@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { useLoaderData, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Title, Table, Button, Flex, Image, Pagination, ActionIcon } from "@mantine/core";
+import { Title, Table, Button, Flex, Image, Pagination, ActionIcon, LoadingOverlay } from "@mantine/core";
 import { IconEye, IconPencil, IconTrash, IconUserPlus } from "@tabler/icons-react";
 import axios from "axios";
 import ModalCustom from "@/components/ModalCustom";
 import { useModal } from "@/customHooks/useModal";
+import { useDisclosure } from "@mantine/hooks";
 
 const tableHead = ["Serial#", "Name", "Email", "Shift", "Position", "Actions"];
 
 const ViewEmployeePage = () => {
+  const [visible, { open,close }] = useDisclosure(false);
   const { loadedEmployees, total } = useLoaderData();
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,8 +69,10 @@ const ViewEmployeePage = () => {
 
   const deleteEmployee = async id => {
     try {
+      open();
       const req = await axios.delete(`http://localhost:5100/employees/${id}`);
       if (req.status === 200) {
+        
         console.log("employee deleted");
       } else {
         console.log("employee delete error");
@@ -77,6 +81,7 @@ const ViewEmployeePage = () => {
     } catch (error) {
       console.log(error);
     } finally {
+      close();
       closeModal();
     }
   };
@@ -84,6 +89,7 @@ const ViewEmployeePage = () => {
   return (
     <Flex direction={"column"} align={"center"} justify={"center"} m={"0 auto"} w={"max-content"}>
       <Title order={1} mb={20} c={"red.7"}>
+      
         Employee Table
       </Title>
       <Button variant="filled" mb={20} style={{ alignSelf: "flex-end" }} onClick={handleAdd}>
@@ -108,7 +114,7 @@ const ViewEmployeePage = () => {
                 return (
                   <Table.Tr key={employee.email}>
                     <Table.Td onClick={handleInfo.bind(null, employee)} align="center">
-                      {index + 1}
+                      {activePage==1?index+1:((activePage-1)*itemsPerPage)+index+1}
                     </Table.Td>
                     <Table.Td onClick={handleInfo.bind(null, employee)}>
                       <Flex align={"center"}>
@@ -153,6 +159,7 @@ const ViewEmployeePage = () => {
         </Table.Tbody>
       </Table>
       <Pagination total={Math.ceil(total / itemsPerPage)} value={activePage} onChange={setPage} mt="sm" />
+      <LoadingOverlay visible={visible} loaderProps={{type:"oval"}} />
       {isOpen && <ModalCustom content={content} onDelete={deleteEmployee} onClose={closeModal} />}
     </Flex>
   );

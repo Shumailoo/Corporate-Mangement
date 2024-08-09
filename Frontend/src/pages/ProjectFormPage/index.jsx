@@ -1,11 +1,13 @@
-import { Title, Button, Grid, NumberInput, TextInput, Flex } from "@mantine/core";
+import { Title, Button, Grid, NumberInput, TextInput, Flex, LoadingOverlay } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useForm } from "@mantine/form";
 import axios from "axios";
+import { useDisclosure } from "@mantine/hooks";
 
 const ProjectFormPage = () => {
+  const [visible, { toggle }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { newId, projectEdit, activePage } = location?.state || {};
@@ -42,9 +44,10 @@ const ProjectFormPage = () => {
   }, [projectId]);
 
   const handleSubmit = async values => {
+    toggle();
     if (isEditMode) {
       const project = {
-        id: projectEdit.id.toString(),
+        id: projectEdit.id,
         projectName: values.projectName,
         description: values.description,
         deliverables: values.deliverables,
@@ -80,6 +83,7 @@ const ProjectFormPage = () => {
 
   return (
     <Grid gutter="lg" bg="gray.1" p="lg" style={{ borderRadius: "10px", width: "60%", margin: "20px auto 0px" }}>
+      <LoadingOverlay visible={visible} loaderProps={{type:"oval"}} />
       <Grid.Col span={12}>
         <Title c={"red.6"} order={1}>
           Project Form

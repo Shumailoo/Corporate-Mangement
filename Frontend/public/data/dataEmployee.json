@@ -12,59 +12,26 @@
       "location": "New York"
     },
     {
-      "id": "6",
-      "name": "ddws",
-      "age": 543,
-      "position": "",
-      "workingMonths": 542,
-      "shift": "",
-      "email": "frgrg@n.com",
-      "department": "",
-      "location": ""
+      "id": "2",
+      "name": "Jane Smith",
+      "age": 34,
+      "position": "Designer",
+      "workingMonths": 36,
+      "shift": "Day",
+      "email": "jane.smith@example.com",
+      "department": "Design",
+      "location": "San Francisco"
     },
     {
-      "id": "6",
-      "name": "jlbbb",
-      "age": "",
-      "position": "",
-      "workingMonths": 6454,
-      "shift": "",
-      "email": "bb@b.com",
-      "department": "",
-      "location": ""
-    },
-    {
-      "id": "6",
-      "name": "fdlb",
-      "age": "",
-      "position": "",
-      "workingMonths": "",
-      "shift": "",
-      "email": "d@g.com",
-      "department": "",
-      "location": ""
-    },
-    {
-      "id": "7",
-      "name": "djkhvkhbkhvhkb",
-      "age": "",
-      "position": "",
-      "workingMonths": "",
-      "shift": "",
-      "email": "sdkfn@f.com",
-      "department": "",
-      "location": ""
-    },
-    {
-      "id": "5",
-      "name": "fljsdh",
-      "age": "",
-      "position": "",
-      "workingMonths": "",
-      "shift": "",
-      "email": "a@g.com",
-      "department": "",
-      "location": ""
+      "id": "3",
+      "name": "Sam Green",
+      "age": 23,
+      "position": "Intern",
+      "workingMonths": 6,
+      "shift": "Morning",
+      "email": "sam.green@example.com",
+      "department": "Engineering",
+      "location": "Austin"
     }
   ]
 }

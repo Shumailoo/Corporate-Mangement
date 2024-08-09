@@ -1,10 +1,13 @@
-import { Container, Text, Button, PasswordInput, TextInput, Anchor } from "@mantine/core";
+import { Container, Text, Button, PasswordInput, TextInput, Anchor, LoadingOverlay } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconAt, IconLock, IconUser } from "@tabler/icons-react";
 import axios from "axios";
 import { useLoaderData, useNavigate } from "react-router-dom";
 
 function SignUpPage() {
+  const [visible, { open,close }] = useDisclosure(false);
   const { loadedUsers }=useLoaderData();
   const navigate=useNavigate();
   const form = useForm({
@@ -24,33 +27,51 @@ function SignUpPage() {
   });
 
   const handleSubmit=async (values)=>{
-    const user=loadedUsers.find(user=>user.email===values.email);
-    if(user){
-      alert('User already exists');
-    }else{
-      const user={
-        id:loadedUsers.length+1,
-        name:values.name,
-        email:values.email,
-        password:values.password
-      }
-      try {
+    open();
+    try {
+      const user=loadedUsers.find(user=>user.email===values.email);
+      if(user){
+        // alert('User already exists');
+        close();
+        notifications.show({
+          title:"User Already Exists",
+          message:"These credentials are already associated with an account. Please use a different credentials.",
+          autoClose:1500,
+        })
+      }else{
+        const user={
+          id:loadedUsers.length+1,
+          name:values.name,
+          email:values.email,
+          password:values.password
+        }
         const res=await axios.post("http://localhost:5102/users",{...user});
         if(res.status===201){
           console.log("new user created");
+          notifications.show({
+            title:"User Created Successfully",
+            message:"You've taken the first step to an amazing journey! Log in now and explore!",
+            autoClose:1500,
+            color:"green"
+          })
         }else{
           console.log('new user not created');
         }
-      } catch (error) {
-        console.log(error);
-      }finally{
-        navigate("/login",{replace:true});
+        form.reset();
+        setTimeout(() => {
+          navigate("/login",{replace:true});
+        }, 1500);
       }
+    } catch (error) {
+      console.log(error);
+    }finally{
+      close();
     }
   }
 
   return (
     <Container size="lg" w={350} py="xl">
+      <LoadingOverlay visible={visible} loaderProps={{type:"oval"}} />
       <Text align="center" size="xl" weight="bold" mb="md">
         Create an account
       </Text>
@@ -83,8 +104,6 @@ export default SignUpPage;
 
 export const UsersLoader=async()=>{
   const res=await axios.get('http://localhost:5102/users');
-  console.log(res);
-  
   if(res){
     return{
       loadedUsers:res.data

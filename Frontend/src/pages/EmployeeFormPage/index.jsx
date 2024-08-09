@@ -1,13 +1,15 @@
-import { Title, Button, Grid, NumberInput, NativeSelect, TextInput, Flex } from "@mantine/core";
+import { Title, Button, Grid, NumberInput, NativeSelect, TextInput, Flex, LoadingOverlay } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useForm } from "@mantine/form";
 import axios from "axios";
+import { useDisclosure } from "@mantine/hooks";
 
 const EmployeeFormPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [visible, { open,close }] = useDisclosure(false);
     const { newId, employeeEdit, activePage } = location?.state || {};
     // const { state}=location;
     const id = useParams("id");
@@ -41,6 +43,7 @@ const EmployeeFormPage = () => {
     }, [id]);
 
     const handleSubmit = async (values) => {
+        open();
         if (isEditMode) {
             const employee = {
                 id: employeeEdit.id,
@@ -78,11 +81,13 @@ const EmployeeFormPage = () => {
                 console.log("employee added error");
             }
         }
+        close();
         navigate("/employees");
     };
 
     return (
         <Grid gutter="lg" bg="gray.1" p="lg" style={{ borderRadius: "10px", width: "60%", margin: "20px auto 0px" }}>
+            <LoadingOverlay visible={visible} loaderProps={{type:"oval"}} />
             <Grid.Col span={12}>
                 <Title c={"red.6"} order={1}>
                     Employee Form

@@ -20,7 +20,7 @@
     },
     {
       "id": "2",
-      "projectName": "Mobile App Developmen",
+      "projectName": "Mobile App Development",
       "description": "Development of a mobile app for the company's new service offerings.",
       "deliverables": [
         "Mobile app (iOS and Android)",
@@ -36,15 +36,6 @@
         6,
         9
       ]
-    },
-    {
-      "id": 3,
-      "projectName": "fdsfn",
-      "description": "",
-      "deliverables": [],
-      "estimatedDeliveryDate": "2024-08-05",
-      "totalSprintMeetings": "",
-      "employeeIds": []
     }
   ]
 }
