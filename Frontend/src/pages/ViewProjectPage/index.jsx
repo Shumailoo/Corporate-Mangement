@@ -56,7 +56,6 @@ const ViewProjectPage = () => {
 
     const deleteProject=async (id)=>{
         open();
-        console.log(45,visible);
         try {
             const res=await axios.delete(`http://localhost:5101/projects/${id}`);
             if(res.status===200){

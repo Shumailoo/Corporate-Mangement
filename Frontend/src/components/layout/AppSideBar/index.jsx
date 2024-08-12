@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core";
 import styles from "./styles.module.css";
 import { useNavigate,useLocation } from "react-router-dom";
-import { IconManFilled, IconRocket } from "@tabler/icons-react";
+import { IconManFilled, IconRocket, IconUserCircle } from "@tabler/icons-react";
 import { Fragment } from "react";
 
 function AppSideBar() {
@@ -12,6 +12,7 @@ function AppSideBar() {
             label: "Employees",
             key: "employees",
             path: "/employees",
+            check:"/employees",
             children: [
                 { label: "Manage Employees", to: "/employees" },
                 // { label: "Add Employee", to: "/employees/add-employee" },
@@ -21,8 +22,19 @@ function AppSideBar() {
             label: "Projects",
             key: "projects",
             path: "/projects",
+            check:"/projects",
             children: [
                 { label: "Manage Projects", to: "/projects" },
+                // { label: "Add Project", to: "/projects/add-project" },
+            ],
+        },
+        {
+            label: "User Profile",
+            key: "profile",
+            path: "/user/profile",
+            check:"/user",
+            children: [
+                // { label: "Manage Projects", to: "/projects" },
                 // { label: "Add Project", to: "/projects/add-project" },
             ],
         },
@@ -34,18 +46,23 @@ function AppSideBar() {
                 return(
                     <Fragment key={link.key}>
                         <Box fz={"xl"} mt={20} pl={15} py={8} key={link.key}
+                        onClick={()=>(navigate(`${link.path}`))}
                         className={`${styles.button} ${
-                            location.pathname.startsWith(link.path) ? `${styles.active}` : ""}`}
+                            location.pathname.startsWith(link.check) ? `${styles.active}` : ""}`}
                         >
                             {link.key === "employees" ? (
-                                    <IconManFilled style={{verticalAlign:"middle",marginRight:"4px"}} size="1rem" stroke={1.5} />
+                                    <IconManFilled style={{verticalAlign:"middle",marginRight:"4px"}} size="1.7rem" stroke={1.5} />
                                 ) : (
-                                    <IconRocket style={{verticalAlign:"middle",marginRight:"4px"}} size="1rem" stroke={1.5} />
+                                    link.key==="projects"?(
+                                    <IconRocket style={{verticalAlign:"middle",marginRight:"4px"}} size="1.7rem" stroke={1.5} />
+                                    ):(
+                                        <IconUserCircle style={{verticalAlign:"middle",marginRight:"4px"}} size="1.7rem" stroke={1.5} />
+                                    )
                                 )
                             }
                             {link.label}
                         </Box>
-                        {link.children.map((child,index)=>{
+                        {/* {link.children.map((child,index)=>{
                             return(
                                 <Fragment key={`${link.key}-${child.label}-${index}`}>
                                 <Box py={7} fz={"md"} mt={15} pl={35}
@@ -57,7 +74,7 @@ function AppSideBar() {
                                 </Box>
                                 </Fragment>
                             );
-                        })}
+                        })} */}
                     </Fragment>
                 );
             })}

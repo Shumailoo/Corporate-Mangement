@@ -1,0 +1,36 @@
+.active{
+  /* padding-left: 25; */
+  color: var(--mantine-color-red-6)!important;
+  background-color: var(--mantine-color-gray-1)!important;
+  /* font-size: 18; */
+  border: 2px solid #f1f3f5!important;
+  border-top-left-radius: 0px!important;
+  border-bottom-left-radius: 0px!important;
+  border-left: 0px!important;
+  border-top-right-radius: 15px!important;
+  border-bottom-right-radius: 15px!important;
+  /* margin-bottom: 40; */
+}
+
+.sidebutton {
+  color: var(--mantine-color-gray-8);
+  padding-left: 25px!important;
+  font-size: 18px!important;
+  border: 2px solid transparent!important;
+  margin-bottom: 20px!important;
+}
+
+.input{
+  color: var(--mantine-color-red-5);
+  width: 50%;
+}
+.input,.input input{
+  font-family: inherit;
+}
+.input input{
+  color: var(--mantine-color-gray-7);
+}
+
+.input input,.input label{
+  font-size: 14px;
+}

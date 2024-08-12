@@ -1,72 +1,55 @@
 import { AuthContext } from '@/context/AuthContext';
-import { Container, Group, Title, Text, Button, PasswordInput, Stack, AppShell, AppShellNavbar, AppShellMain, Flex } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { IconLock } from '@tabler/icons-react';
-import { useContext } from 'react';
+import { Box, Container, Group, Image, Text } from '@mantine/core';
+import { useContext, useEffect, useState } from 'react';
+import styles from "./styles.module.css";
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { IconBulbFilled, IconKeyFilled } from '@tabler/icons-react';
 
 function UserProfileLayout() {
-  const [visible, { open,close }] = useDisclosure(false);
   const {user}=useContext(AuthContext);
-  console.log(user);
+  const navigate=useNavigate();
+  const location=useLocation();
+  const [active,setActive]=useState(location.pathname === "/user/profile");
   
-  const form = useForm({
-    validateInputOnChange: true,
-    initialValues: {
-      password: "",
-      newPassword: "",
-      confirmPassword: "",
-    },
-    validate: {
-      password: value => (value.length < 2 ? "Password should be at least 2 characters long" : null),
-      newPassword: value => (value.length < 2 ? "Password should be at least 2 characters long" : null),
-      confirmPassword:(value, values) => (value !== values.newPassword ? "Passwords do not match" : null),
-    },
-  });
-
-  const handleSubmit = async () => {
-    
-  };
-
-  // return (
-  //   <Flex>
-  //     <Container w={"30%"}>
-  //       okg
-  //     </Container>
-  //     <Container size="sm" ml={30}>
-  //       <Stack mt={10}mb={20}>
-  //         <Title c={"red.6"}>Profile</Title>
-  //         <Text c={"gray.6"}>Manage your account settings</Text>
-  //       </Stack>
-  //       <Text>Profile Information</Text>
-  //       <Text>Name: {user.userName}</Text>
-  //       <Text>Email: {user.userEmail}</Text>
-  //       <Text weight="bold">Account Settings</Text>
-  //       <Button variant="filled">
-  //         Change Password
-  //       </Button>
-  //       <form onSubmit={form.onSubmit((values,event)=>{
-  //           event.preventDefault();
-  //           handleSubmit(values);
-  //         })}>
-  //         <PasswordInput label="Password" placeholder="Password" size="md" icon={<IconLock size={18} />} mb="md" {...form.getInputProps("password")} />
-  //         <PasswordInput label="New Password" placeholder="New Password" size="md" icon={<IconLock size={18} />} mb="md" {...form.getInputProps("newPassword")} />
-  //         <PasswordInput label="Confirm Password" placeholder="Confirm Password" size="md" icon={<IconLock size={18} />} mb="md" {...form.getInputProps("confirmPassword")} />
-  //         <Button type="submit" variant="filled">
-  //           Submit
-  //         </Button>
-  //       </form>
-  //     </Container>
-  //   </Flex>
-  
-    
-      
-      
-  // );
+  useEffect(()=>{},[location.pathname])
 
   return (
-    
+    <>
+      <Container ml={0} p={0} style={{maxWidth:"none"}}>
+        <Group pl={60} pb={10} align='flex-start' style={{borderBottom:"1px solid #dcdedf"}}>
+          <Image src={"/src/assets/profile.png"} fit="cover" h={"160px"}/>
+          <Box c={"red.6"}>
+            <h1 style={{margin:"30px 0 0 0"}}>{user.userName}&apos;s Profile</h1>
+            <Text fz={"18px"} c={"gray.6"} style={{fontStyle:"italic"}}>This is your personal space, tailored to your needs and preferences.</Text>
+          </Box>
+        </Group>
+        <Group align='flex-start' mt={20}>
+          <Box w={"16%"} h={"50vh"} style={{borderRight:"1px solid #dcdedf"}} pt={20} pr={4}>
+            <Box
+              className={`${styles.sidebutton} ${active ? `${styles.active}` : ""}`}
+              onClick={()=>{
+              setActive(true);
+              navigate("/user/profile")
+            }}>
+              <IconBulbFilled style={{verticalAlign:"sub",marginRight:"4px"}} size="1.5rem" stroke={1.5}/>
+              Profile Information
+            </Box>
+            <Box 
+              className={`${styles.sidebutton} ${!active ? `${styles.active}` : ""}`}
+              onClick={()=>{
+              setActive(false);
+              navigate("/user/settings")
+            }}>
+              <IconKeyFilled style={{verticalAlign:"sub",marginRight:"4px"}} size="1.5rem" stroke={1.5}/>
+              Profile Settings
+            </Box>
+          </Box>
+          <>
+            <Outlet/>
+          </>
+        </Group>
+      </Container>
+    </>
   );
 }
 

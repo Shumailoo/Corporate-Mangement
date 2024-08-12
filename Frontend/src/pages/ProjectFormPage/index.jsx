@@ -11,7 +11,6 @@ const ProjectFormPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { newId, projectEdit, activePage } = location?.state || {};
-  console.log(projectEdit);
 
   const projectId = useParams("id");
   const [isEditMode, setIsEditMode] = useState(false);
@@ -36,9 +35,7 @@ const ProjectFormPage = () => {
 
   useEffect(() => {
     if (projectEdit) {
-      const ok = form.setValues(projectEdit);
-      console.log(ok);
-
+      form.setValues(projectEdit);
       setIsEditMode(true);
     }
   }, [projectId]);

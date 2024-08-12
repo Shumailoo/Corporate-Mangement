@@ -1,20 +1,22 @@
 import { createTheme, MantineProvider } from "@mantine/core";
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
 import "./App.css";
-import ViewEmployeePage from "@/pages/ViewEmployeePage";
-import EmployeeFormPage from "@/pages/EmployeeFormPage";
+import ViewEmployeePage from "@pages/ViewEmployeePage";
+import EmployeeFormPage from "@pages/EmployeeFormPage";
 import AppShellLayout from "./components/layout/AppShellLayout";
-import LoginPage from "./pages/AuthPages/LoginPage";
-import SignupPage from "./pages/AuthPages/SignupPage";
-import ProjectFormPage from "./pages/ProjectFormPage";
-import ViewProjectPage, { ProjectLoader } from "./pages/ViewProjectPage";
-import AuthLayout from "./components/layout/AuthLayout";
-import { EmployeeLoader } from "@/pages/ViewEmployeePage";
-import { UsersLoader } from "@/pages/AuthPages/SignupPage";
-import { AuthContextProvider } from "./context/AuthContext";
+import LoginPage from "@pages/AuthPages/LoginPage";
+import SignupPage from "@pages/AuthPages/SignupPage";
+import ProjectFormPage from "@pages/ProjectFormPage";
+import ViewProjectPage, { ProjectLoader } from "@pages/ViewProjectPage";
+import AuthLayout from "@components/layout/AuthLayout";
+import { EmployeeLoader } from "@pages/ViewEmployeePage";
+import { UsersLoader } from "@pages/AuthPages/SignupPage";
+import { AuthContextProvider } from "@/context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import { Notifications } from "@mantine/notifications";
-import UserProfileLayout from "./pages/UserProfile";
+import UserProfileLayout from "@pages/UserProfile";
+import ProfileContentPage from "@pages/UserProfile/ProfileContentPage";
+import ProfileSettingsPage from "@pages/UserProfile/ProfileSettingsPage";
 
 const theme = createTheme({
   fontFamily: "Open Sans, sans-serif",
@@ -38,9 +40,9 @@ const router = createBrowserRouter(
           <Route path="add-project" element={<ProjectFormPage />} />
         </Route>
         <Route path="user" element={<AppShellLayout />}>
-          <Route index element={<UserProfileLayout />}>
-            <Route path="profile" element={<UserProfileLayout />} />
-            <Route path="settings" element={}/>
+          <Route element={<UserProfileLayout />}>
+            <Route path="profile" element={<ProfileContentPage />} />
+            <Route path="settings" element={<ProfileSettingsPage/>}/>
           </Route>
         </Route>
       </Route>
