@@ -15,7 +15,7 @@ import { AuthContextProvider } from "@/context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import { Notifications } from "@mantine/notifications";
 import UserProfileLayout from "@pages/UserProfile";
-import ProfileContentPage from "@pages/UserProfile/ProfileContentPage";
+// import ProfileContentPage from "@pages/UserProfile/ProfileContentPage";
 import ProfileSettingsPage from "@pages/UserProfile/ProfileSettingsPage";
 
 const theme = createTheme({
@@ -41,8 +41,8 @@ const router = createBrowserRouter(
         </Route>
         <Route path="user" element={<AppShellLayout />}>
           <Route element={<UserProfileLayout />}>
-            <Route path="profile" element={<ProfileContentPage />} />
             <Route path="settings" element={<ProfileSettingsPage/>}/>
+            {/* <Route path="profile" element={<ProfileContentPage />} /> */}
           </Route>
         </Route>
       </Route>

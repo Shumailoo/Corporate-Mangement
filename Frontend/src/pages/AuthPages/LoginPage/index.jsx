@@ -40,7 +40,7 @@ function LoginPage() {
       }
       login({
         userName:user.name,
-        // userId:user.id,
+        userId:user.id,
         userEmail:user.email,
       })
     }else{

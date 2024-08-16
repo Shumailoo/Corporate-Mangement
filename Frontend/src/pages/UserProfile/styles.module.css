@@ -34,3 +34,15 @@
 .input input,.input label{
   font-size: 14px;
 }
+
+
+.my_tab[data-active]{
+  font-size: 14px;
+  /* background-color:var(--mantine-color-gray-0); */
+  color: var(--mantine-color-red-6);
+}
+.my_tab:hover{
+  background-color:var(--mantine-color-gray-0);
+  font-size: 14px;
+  color: var(--mantine-color-red-6);
+}

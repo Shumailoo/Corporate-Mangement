@@ -31,7 +31,7 @@ function AppSideBar() {
         {
             label: "User Profile",
             key: "profile",
-            path: "/user/profile",
+            path: "/user/settings",
             check:"/user",
             children: [
                 // { label: "Manage Projects", to: "/projects" },

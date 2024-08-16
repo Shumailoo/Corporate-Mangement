@@ -14,7 +14,7 @@ const CustomHeader = () => {
             <Flex align={"center"}>
                 <Text size="25px" c={"white"} bg={"red.5"} p={5} m={"0px 15px"} style={{borderRadius: "50%",transform: "scaleX(1.5)",fontStretch: "expanded",}}>R</Text>
                 <Text onClick={()=>{
-                    navigate("/user/profile")
+                    navigate("/employees")
                 }} weight={700} size="25px">
                     CorpR.
                 </Text>
@@ -38,7 +38,7 @@ const CustomHeader = () => {
             </MenuTarget>
                 <Menu.Dropdown>
                     <Menu.Item leftSection={<IconBulb style={{verticalAlign:"sub",marginRight:"4px"}} size="1.5rem" stroke={1.5}/>} onClick={()=>{
-                        navigate("/user/profile")
+                        navigate("/user/settings")
                     }}>Profile</Menu.Item>
                     <Menu.Item leftSection={<IconKey style={{verticalAlign:"sub",marginRight:"4px"}} size="1.5rem" stroke={1.5}/>} onClick={()=>{
                         navigate("/user/settings")
