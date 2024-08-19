@@ -10,7 +10,9 @@ import ProjectFormPage from "@pages/ProjectFormPage";
 import ViewProjectPage, { ProjectLoader } from "@pages/ViewProjectPage";
 import AuthLayout from "@components/layout/AuthLayout";
 import { EmployeeLoader } from "@pages/ViewEmployeePage";
+import { ProjectEmployeeLoader } from "@pages/ProjectFormPage";
 import { UsersLoader } from "@pages/AuthPages/SignupPage";
+import { UserDataLoader } from "@pages/UserProfile";
 import { AuthContextProvider } from "@/context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import { Notifications } from "@mantine/notifications";
@@ -33,16 +35,15 @@ const router = createBrowserRouter(
       <Route element={<PrivateRoute />}>
         <Route path="employees" element={<AppShellLayout />}>
           <Route index element={<ViewEmployeePage />} loader={EmployeeLoader} id="employees" />
-          <Route path="add-employee" element={<EmployeeFormPage />} />
+          <Route path="add-employee" element={<EmployeeFormPage />}/>
         </Route>
         <Route path="projects" element={<AppShellLayout />}>
           <Route index element={<ViewProjectPage />} loader={ProjectLoader} />
-          <Route path="add-project" element={<ProjectFormPage />} />
+          <Route path="add-project" element={<ProjectFormPage />} loader={ProjectEmployeeLoader} />
         </Route>
         <Route path="user" element={<AppShellLayout />}>
           <Route element={<UserProfileLayout />}>
-            <Route path="settings" element={<ProfileSettingsPage/>}/>
-            {/* <Route path="profile" element={<ProfileContentPage />} /> */}
+            <Route path="settings" element={<ProfileSettingsPage/>} loader={UserDataLoader}/>
           </Route>
         </Route>
       </Route>

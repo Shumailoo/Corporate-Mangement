@@ -6,6 +6,7 @@ import { IconBulbFilled, IconKeyFilled } from '@tabler/icons-react';
 import ProfileContentPage from './ProfileContentPage';
 import ProfileSettingsPage from './ProfileSettingsPage';
 import classes from "./styles.module.css";
+import axios from 'axios';
 
 
 function UserProfileLayout() {
@@ -44,3 +45,15 @@ function UserProfileLayout() {
 }
 
 export default UserProfileLayout;
+
+export const UserDataLoader=async()=>{
+  const {user}=useContext(AuthContext);
+  const res=await axios.get(`http://localhost:5000/api/user/users/${user.userId}`);
+  if(res.status==200){
+    console.log(res.data);
+    
+    return res.data;
+  }else{
+    return {error:"error fetching user data"}
+  }
+}

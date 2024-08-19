@@ -11,13 +11,14 @@ const tableHead = ["Serial#", "Project Name", "Description", "Estimated Delivery
 
 const ViewProjectPage = () => {
     const [visible, { open,close }] = useDisclosure(false);
-    const { loadedProjects,total }=useLoaderData();
+    const { loadedProjects,totalPages,totalProducts,currentPage }=useLoaderData();
     const navigate = useNavigate();
     const { isOpen, content, openModal, closeModal } = useModal();
+    
     // pagination
     const [searchParams, setSearchParams] = useSearchParams();
-    const [activePage, setPage] = useState(parseInt(searchParams.get("page")) || 1);
-    const [itemsPerPage] = useState(2);
+    const [activePage, setPage] = useState(parseInt(currentPage || searchParams.get("page") || 1));
+    const itemsPerPage = Math.ceil(totalProducts/totalPages);
 
 
     useEffect(() => {
@@ -29,6 +30,8 @@ const ViewProjectPage = () => {
     };
 
     const handleInfo = project => {
+        // console.log(project);
+        
         openModal({
             type:"info",
             data:project,
@@ -37,10 +40,9 @@ const ViewProjectPage = () => {
     };
 
     const handleEdit = projectEdit => {
-        navigate(`add-project?id=${projectEdit.id}`,{ 
+        navigate(`add-project?id=${projectEdit._id}`,{ 
             state:{
                 projectEdit:projectEdit,
-                loadedProjects:loadedProjects,
             }
         });
         setPage(activePage);
@@ -99,7 +101,7 @@ const ViewProjectPage = () => {
                     {loadedProjects.length > 0
                         ? loadedProjects.map((project, index) => {
                             return (
-                                <Table.Tr key={project.id}>
+                                <Table.Tr key={project._id}>
                                     <Table.Td onClick={handleInfo.bind(null, project)}  align="center">{activePage==1?index+1:((activePage-1)*itemsPerPage)+index+1}</Table.Td>
                                     <Table.Td onClick={handleInfo.bind(null, project)} >{project.projectName}</Table.Td>
                                     <Table.Td onClick={handleInfo.bind(null, project)}  style={{ wordBreak: 'break-word' }}>{project.description}</Table.Td>
@@ -110,7 +112,7 @@ const ViewProjectPage = () => {
                                             <ActionIcon variant="light" onClick={()=>{handleInfo(project)}}>
                                                 <IconEye />
                                             </ActionIcon>
-                                            <ActionIcon variant="outline" onClick={()=>{project.id?handleEdit(project):void 0;
+                                            <ActionIcon variant="outline" onClick={()=>{project._id?handleEdit(project):void 0;
                                             }} >
                                                 <IconPencil />
                                             </ActionIcon>
@@ -126,7 +128,7 @@ const ViewProjectPage = () => {
                 </Table.Tbody>
             </Table>
             <Pagination
-                total={Math.ceil(total / itemsPerPage)}
+                total={totalPages}
                 value={activePage}
                 onChange={setPage}
                 mt="sm"
@@ -143,12 +145,15 @@ export default ViewProjectPage;
 export const ProjectLoader=async({request})=>{
     const url = new URL(request.url);
     const page = url.searchParams.get("page") || 1;
-    const perPage = 2;
-    const res=await axios.get(`http://localhost:5101/projects?_page=${page}&_per_page=${perPage}`);
+    const res=await axios.get(`http://localhost:5000/api/project/projects?page=${page}`);
+    // console.log(res.data);
+    
     if(res.status===200){
         return {
-            loadedProjects: res.data.data,
-            total: res.data.items,
+            loadedProjects: res.data.projects,
+            totalProducts: res.data.totalProjects,
+            totalPages:res.data.totalPages,
+            currentPage:res.data.currentPage,
         };
     }
     else{

@@ -11,16 +11,19 @@ const tableHead = ["Serial#", "Name", "Email", "Shift", "Position", "Actions"];
 
 const ViewEmployeePage = () => {
   const [visible, { open,close }] = useDisclosure(false);
-  const { loadedEmployees, total } = useLoaderData();
+  const { loadedEmployees, totalItems,currentPage,totalPages } = useLoaderData();
+  // console.log(loadedEmployees,totalItems,totalPages,currentPage);
+  
   const navigate = useNavigate();
   const location = useLocation();
   const { activePageEdit } = location?.state || {};
   const { isOpen, content, openModal, closeModal } = useModal();
 
   // states for pagination
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [activePage, setPage] = useState(parseInt(searchParams.get("page")) || 1);
-  const [itemsPerPage] = useState(4);
+  const [ searchParams,setSearchParams ] = useSearchParams();
+  const [activePage, setPage] = useState(parseInt(currentPage || searchParams.get("page") || 1));
+  
+  const itemsPerPage = Math.ceil(totalItems/totalPages);
   // indeces for pagination
   // const startIndex = (activePage - 1) * itemsPerPage;
   // const endIndex = startIndex + itemsPerPage;
@@ -38,7 +41,7 @@ const ViewEmployeePage = () => {
   }, [activePage, setSearchParams]);
 
   const handleAdd = () => {
-    navigate("add-employee", { state: { newId: loadedEmployees.length + 1 } });
+    navigate("add-employee");
   };
 
   const handleInfo = employee => {
@@ -50,10 +53,11 @@ const ViewEmployeePage = () => {
   };
 
   const handleEdit = employeeEdit => {
-    navigate(`add-employee?id=${employeeEdit.id}`, {
+    // console.log(12);
+    
+    navigate(`add-employee?id=${employeeEdit._id}`, {
       state: {
         employeeEdit: employeeEdit,
-        loadedEmployees: loadedEmployees,
       },
     });
     setPage(activePage);
@@ -70,7 +74,7 @@ const ViewEmployeePage = () => {
   const deleteEmployee = async id => {
     try {
       open();
-      const req = await axios.delete(`http://localhost:5100/employees/${id}`);
+      const req = await axios.delete(`http://localhost:5000/api/employee/employees/${id}`);
       if (req.status === 200) {
         
         console.log("employee deleted");
@@ -138,7 +142,7 @@ const ViewEmployeePage = () => {
                         <ActionIcon
                           variant="outline"
                           onClick={() => {
-                            employee.id ? handleEdit(employee) : void 0;
+                            employee._id ? handleEdit(employee) : void 0;
                           }}
                         >
                           <IconPencil />
@@ -158,7 +162,7 @@ const ViewEmployeePage = () => {
             : null}
         </Table.Tbody>
       </Table>
-      <Pagination total={Math.ceil(total / itemsPerPage)} value={activePage} onChange={setPage} mt="sm" />
+      <Pagination total={totalPages} value={activePage} onChange={setPage} mt="sm" />
       <LoadingOverlay visible={visible} loaderProps={{type:"oval"}} />
       {isOpen && <ModalCustom content={content} onDelete={deleteEmployee} onClose={closeModal} />}
     </Flex>
@@ -170,12 +174,15 @@ export default ViewEmployeePage;
 export const EmployeeLoader = async ({ request }) => {
   const url = new URL(request.url);
   const page = url.searchParams.get("page") || 1;
-  const perPage = 4;
-  const res = await axios.get(`http://localhost:5100/employees?_page=${page}&_per_page=${perPage}`);
+  const res = await axios.get(`http://localhost:5000/api/employee/employees?page=${page}`);
   if (res.status === 200) {
+    // console.log(res.data);
+    
     return {
-      loadedEmployees: res.data.data,
-      total: res.data.items,
+      loadedEmployees: res.data.employees,
+      totalItems: res.data.totalItems,
+      currentPage:res.data.currentPage,
+      totalPages: res.data.totalPages,
     };
   } else {
     console.log("error fetch employee");

@@ -1,16 +1,18 @@
-import { Title, Button, Grid, NumberInput, TextInput, Flex, LoadingOverlay } from "@mantine/core";
+import { Title, Button, Grid, NumberInput, TextInput, Flex, LoadingOverlay, MultiSelect, TagsInput } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useLocation, useParams, useLoaderData } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useForm } from "@mantine/form";
 import axios from "axios";
 import { useDisclosure } from "@mantine/hooks";
+import moment from "moment";
 
 const ProjectFormPage = () => {
   const [visible, { toggle }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { newId, projectEdit, activePage } = location?.state || {};
+  const { projectEdit, activePage } = location?.state || {};
+  const {employees}=useLoaderData();
 
   const projectId = useParams("id");
   const [isEditMode, setIsEditMode] = useState(false);
@@ -35,7 +37,10 @@ const ProjectFormPage = () => {
 
   useEffect(() => {
     if (projectEdit) {
-      form.setValues(projectEdit);
+      // form.setValues(projectEdit);
+
+      const estimatedDeliveryDate = moment(projectEdit.estimatedDeliveryDate).format('yyyy-MM-DD');
+      form.setValues({ ...projectEdit, estimatedDeliveryDate });
       setIsEditMode(true);
     }
   }, [projectId]);
@@ -44,7 +49,7 @@ const ProjectFormPage = () => {
     toggle();
     if (isEditMode) {
       const project = {
-        id: projectEdit.id,
+        ...projectEdit,
         projectName: values.projectName,
         description: values.description,
         deliverables: values.deliverables,
@@ -52,7 +57,7 @@ const ProjectFormPage = () => {
         totalSprintMeetings: values.totalSprintMeetings,
         employeeIds: values.employeeIds,
       };
-      const req = await axios.put("http://localhost:5101/projects/" + project.id, { ...project });
+      const req = await axios.put("http://localhost:5000/api/project/projects/" + project._id, { ...project });
       if (req.status === 200) {
         console.log("edited project success");
       } else {
@@ -60,7 +65,6 @@ const ProjectFormPage = () => {
       }
     } else {
       const project = {
-        id: newId,
         projectName: values.projectName,
         description: values.description,
         deliverables: values.deliverables,
@@ -68,7 +72,7 @@ const ProjectFormPage = () => {
         totalSprintMeetings: values.totalSprintMeetings,
         employeeIds: values.employeeIds,
       };
-      const req = await axios.post("http://localhost:5101/projects", { ...project });
+      const req = await axios.post("http://localhost:5000/api/project/projects/", { ...project });
       if (req.status === 201) {
         console.log("project added");
       } else {
@@ -101,9 +105,6 @@ const ProjectFormPage = () => {
               <TextInput placeholder="Enter description" className={styles.input} label="Description" {...form.getInputProps("description")} />
             </Grid.Col>
             <Grid.Col span={6}>
-              <TextInput className={styles.input} placeholder="Enter deliverables (comma separated)" label="Deliverables" {...form.getInputProps("deliverables")} />
-            </Grid.Col>
-            <Grid.Col span={6}>
               <TextInput withAsterisk type="date" className={styles.input} label="Estimated Delivery Date" {...form.getInputProps("estimatedDeliveryDate")} />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -116,8 +117,31 @@ const ProjectFormPage = () => {
                 allowDecimal={false}
               />
             </Grid.Col>
-            <Grid.Col span={6}>
-              <TextInput className={styles.input} placeholder="Enter employee IDs (comma separated)" label="Employee IDs" {...form.getInputProps("employeeIds")} />
+            <Grid.Col span={12}>
+                <TagsInput
+                  className={styles.input}
+                  placeholder="Enter deliverables"
+                  label="Deliverables (press enter key to add specific deliverable)"
+                  defaultValue={form.values.deliverables}
+                  {...form.getInputProps("deliverables")}
+                />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <MultiSelect
+                className={styles.input}
+                label="Employees"
+                placeholder="Add employees"
+                data={employees.map((e) => ({ value: e._id, label: `${e.name} (${e.department})` }))}
+                clearable
+                hidePickedOptions
+                value={form.values.employeeIds.map((emp) => emp._id)} // Extract the IDs from the selected employees
+                onChange={(selectedIds) => {
+                  const selectedEmployees = selectedIds.map((id) =>
+                    employees.find((e) => e._id === id)
+                  );
+                  form.setFieldValue('employeeIds', selectedEmployees); // Update the form state with the full objects
+                }}
+              />
             </Grid.Col>
             <Grid.Col span={12}>
               <Flex mt={20} justify={"flex-end"} align={"center"}>
@@ -149,3 +173,16 @@ const ProjectFormPage = () => {
 };
 
 export default ProjectFormPage;
+
+export const ProjectEmployeeLoader=async()=>{
+  const res=await axios.get("http://localhost:5000/api/employee/employees");
+  // console.log(res);
+  
+  if(res.status==200){
+    return{
+      employees:res.data,
+    };
+  }else {
+    console.log("error fetch product employees");
+  }
+}

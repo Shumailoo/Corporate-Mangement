@@ -10,7 +10,7 @@ const EmployeeFormPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [visible, { open,close }] = useDisclosure(false);
-    const { newId, employeeEdit, activePage } = location?.state || {};
+    const { employeeEdit, activePage } = location?.state || {};
     // const { state}=location;
     const id = useParams("id");
     const [isEditMode, setIsEditMode] = useState(false);
@@ -46,7 +46,7 @@ const EmployeeFormPage = () => {
         open();
         if (isEditMode) {
             const employee = {
-                id: employeeEdit.id,
+                id: employeeEdit._id,
                 name: values.name,
                 age: values.age,
                 position: values.position,
@@ -56,7 +56,7 @@ const EmployeeFormPage = () => {
                 department: values.department,
                 location: values.location,
             };
-            const req = await axios.put("http://localhost:5100/employees/" + employee.id, { ...employee });
+            const req = await axios.put("http://localhost:5000/api/employee/employees/" + employee.id, { ...employee });
             if (req.status === 200) {
                 console.log("edited employee success");
             } else {
@@ -64,7 +64,6 @@ const EmployeeFormPage = () => {
             }
         } else {
             const employee = {
-                id: newId.toString(),
                 name: values.name,
                 age: values.age,
                 position: values.position,
@@ -74,7 +73,7 @@ const EmployeeFormPage = () => {
                 department: values.department,
                 location: values.location,
             };
-            const req = await axios.post("http://localhost:5100/employees", { ...employee });
+            const req = await axios.post("http://localhost:5000/api/employee/employees", { ...employee });
             if (req.status === 201) {
                 console.log("Employee added");
             } else {

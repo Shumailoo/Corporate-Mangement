@@ -2,21 +2,27 @@ const Employee = require('../models/Employee');
 
 // Get all employees with pagination
 exports.getEmployees = async (req, res) => {
+  
   try {
-    const currentPage = req.query.page || 1;
-    const perPage = 2;
-    const totalEmployees = await Employee.countDocuments();
-
-    const employees = await Employee.find()
-      .skip((currentPage - 1) * perPage)
-      .limit(perPage);
-
-    res.status(200).json({
-      employees,
-      totalItems: totalEmployees,
-      currentPage,
-      totalPages: Math.ceil(totalEmployees / perPage)
-    });
+    if(req.query.page){
+      const currentPage = req.query.page || 1;
+      const perPage = 2;
+      const totalEmployees = await Employee.countDocuments();
+  
+      const employees = await Employee.find()
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+      
+      res.status(200).json({
+        employees,
+        totalItems: totalEmployees,
+        currentPage,
+        totalPages: Math.ceil(totalEmployees / perPage)
+      });
+    }else{
+      const employees=await Employee.find({},"_id name department");
+      res.status(200).json(employees);
+    }
   } catch (error) {
     console.error("Error fetching employees:", error);
     res.status(500).json({ message: "Error fetching employees" });
@@ -43,7 +49,25 @@ exports.getEmployee = async (req, res) => {
 // Add a new employee
 exports.addEmployee = async (req, res) => {
   try {
-    const newEmployee = new Employee(req.body);
+    const name=req.body.name;
+    const email=req.body.email;
+    const position=req.body.position || "Intern";
+    const age=req.body.age || 18;
+    const workingMonths=req.body.workingMonths || "1";
+    const shift=req.body.shift || "Morning";
+    const department=req.body.department || "Engineering";
+    const location=req.body.location || "Pakistan";
+    
+    const newEmployee = new Employee({
+      name:name,
+      email:email,
+      position:position,
+      age:age,
+      workingMonths:workingMonths,
+      shift:shift,
+      department:department,
+      location:location,
+    });
     const employee = await newEmployee.save();
 
     res.status(201).json({

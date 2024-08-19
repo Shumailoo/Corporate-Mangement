@@ -4,8 +4,11 @@ import { Button, Flex, Grid, Image, Modal, Text, Title } from "@mantine/core";
 const ModalCustom=({ content, onDelete, onClose })=>{
     const size = content.type === "info" ? "xl" : "md";
     const centered=content.type==="info"? false:true;
-    const title=content.contentType==="project"? "Project Details":"Employee Details"
+    const title=content.contentType==="project"? "Project Details":"Employee Details";
+    // console.log(content.data);
+    
     return(
+        // <Text>ok</Text>
         <Modal
             opened={true}
             onClose={onClose}
@@ -82,7 +85,7 @@ const ModalCustom=({ content, onDelete, onClose })=>{
                                         {content.data.deliverables}
                                     </Text>
                                 </Grid.Col>
-                                <Grid.Col span={1}>
+                                {/* <Grid.Col span={1}>
                                     <Text size="18px" style={{ fontWeight: 700 }}>
                                         Employee IDs:
                                     </Text>
@@ -91,7 +94,7 @@ const ModalCustom=({ content, onDelete, onClose })=>{
                                     <Text size="18px" style={{ fontWeight: 300 }}>
                                         {content.data.employeeIds}
                                     </Text>
-                                </Grid.Col>
+                                </Grid.Col> */}
                             </Grid>    
                         
                         </>
@@ -164,7 +167,7 @@ const ModalCustom=({ content, onDelete, onClose })=>{
                     <Text c={"gray.6"} fz={14}><i>(Once you delete, will not be recovered.)</i></Text>
                     <Flex justify={"flex-end"} align={"center"} mt={20}>
                         <Button variant="outline" color="red" mr={20} onClick={onClose}>Return</Button>
-                        <Button variant="filled" color="red" onClick={()=>onDelete(content.data.id)}>Delete</Button>
+                        <Button variant="filled" color="red" onClick={()=>onDelete(content.data._id)}>Delete</Button>
                     </Flex>    
                 </>
             )}

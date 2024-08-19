@@ -9,8 +9,9 @@ const parser=require("body-parser");
 
 const mongoDbConnect=require("./config/db");
 const authRoute=require("./routes/authRoutes");
-const productRoute=require("./routes/productRoutes");
+const projectRoute=require("./routes/projectRoutes");
 const employeetRoute=require("./routes/employeeRoutes");
+const userRoute=require("./routes/userRoutes");
 const {isAuthenticated}=require("./middlewares/authMiddleware");
 
 // Configure dotenv to load variables from .env file
@@ -99,7 +100,10 @@ app.use(session({
 //   next();
 // });
 app.use("/api/auth",authRoute);
-app.use("/api/product",isAuthenticated,productRoute);
-app.use("/api/employee",isAuthenticated,employeetRoute);
+// app.use("/api/project",isAuthenticated,projectRoute);
+app.use("/api/project",projectRoute);
+// app.use("/api/employee",isAuthenticated,employeetRoute);
+app.use("/api/employee",employeetRoute);
+app.use("/api/user",userRoute);
 
 serverStart();

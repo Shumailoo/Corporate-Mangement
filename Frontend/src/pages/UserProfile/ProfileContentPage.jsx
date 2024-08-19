@@ -23,7 +23,7 @@ const ProfileContentPage=()=>{
   });
 
   const handleSubmit = async (values) => {
-    console.log(user);
+    // console.log(user);
     
     const editUser={
       ...user,
@@ -36,7 +36,7 @@ const ProfileContentPage=()=>{
       const res=await axios.put(`http://localhost:5102/users/${user.userId}`,{
         ...editUser
       });
-      console.log(res);
+      // console.log(res);
       
       if(res.status===200){
         console.log("profile changed success");

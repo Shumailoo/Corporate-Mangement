@@ -34,7 +34,7 @@ const ProfileSettingsPage=()=>{
       const res=await axios.put(`http://localhost:5102/users/${user.userId}`,{
         ...editUser
       });
-      console.log(res);
+      // console.log(res);
       
       if(res.status===200){
         console.log("password changed success");
