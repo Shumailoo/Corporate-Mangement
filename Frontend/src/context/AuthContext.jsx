@@ -7,8 +7,8 @@ const AuthContext=createContext();
 const AuthContextProvider=({children})=>{
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
   // const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-  const [user, setUser] = useState({userName:"shum",userEmail:"s@gmail.com",userId:"5"});
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
 
   const login = (user) => {
     setIsAuthenticated(true);
@@ -20,7 +20,7 @@ const AuthContextProvider=({children})=>{
     setUser(null);
   };
   return(
-    <AuthContext.Provider value={{isAuthenticated, user, login, logout}}>
+    <AuthContext.Provider value={{isAuthenticated, user, setUser, login, logout}}>
       {children}
     </AuthContext.Provider>
   )

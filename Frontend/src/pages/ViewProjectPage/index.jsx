@@ -59,7 +59,7 @@ const ViewProjectPage = () => {
     const deleteProject=async (id)=>{
         open();
         try {
-            const res=await axios.delete(`http://localhost:5101/projects/${id}`);
+            const res=await axios.delete(`http://localhost:5000/api/project/projects/${id}`);
             if(res.status===200){
                 console.log("deleted project success");
             }
@@ -146,7 +146,7 @@ export const ProjectLoader=async({request})=>{
     const url = new URL(request.url);
     const page = url.searchParams.get("page") || 1;
     const res=await axios.get(`http://localhost:5000/api/project/projects?page=${page}`);
-    // console.log(res.data);
+    console.log(res);
     
     if(res.status===200){
         return {

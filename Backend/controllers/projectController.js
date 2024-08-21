@@ -2,6 +2,7 @@ const Project = require('../models/Project'); // Assuming your Project model is 
 
 // Get all projects with pagination
 exports.getProjects = async (req, res) => {
+  console.log(req.cookies);
   
   const currentPage = req.query.page || 1;
   const pageSize = 2;
@@ -46,17 +47,17 @@ exports.getProject = async (req, res) => {
 
 // Add a new project
 exports.addProject = async (req, res) => {
-  console.log(req);
+  console.log(12,req.body);
   
   try {
-    const name=req.body.name;
+    const projectName=req.body.projectName;
     const estimatedDeliveryDate=req.body.estimatedDeliveryDate;
     const description=req.body.description || "project";
     const totalSprintMeetings=req.body.totalSprintMeetings || 1;
     const deliverables=req.body.deliverables || [];
     const employeeIds=req.body.employeeIds || [];
     const newProject = new Project({
-      name:name,
+      projectName:projectName,
       estimatedDeliveryDate:estimatedDeliveryDate,
       description:description,
       totalSprintMeetings:totalSprintMeetings,
@@ -73,7 +74,7 @@ exports.addProject = async (req, res) => {
       project: populatedProject
     });
   } catch (error) {
-    console.error('Error adding project:', error);
+    // console.error('Error adding project:', error);
     res.status(500).json({ message: 'Server error adding project' });
   }
 };

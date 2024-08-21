@@ -11,8 +11,7 @@ import ViewProjectPage, { ProjectLoader } from "@pages/ViewProjectPage";
 import AuthLayout from "@components/layout/AuthLayout";
 import { EmployeeLoader } from "@pages/ViewEmployeePage";
 import { ProjectEmployeeLoader } from "@pages/ProjectFormPage";
-import { UsersLoader } from "@pages/AuthPages/SignupPage";
-import { UserDataLoader } from "@pages/UserProfile";
+// import { UsersLoader } from "@pages/AuthPages/SignupPage";
 import { AuthContextProvider } from "@/context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import { Notifications } from "@mantine/notifications";
@@ -29,8 +28,8 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path="/" element={<AuthLayout />}>
-        <Route path="login" element={<LoginPage />} loader={UsersLoader} />
-        <Route path="signup" element={<SignupPage />} loader={UsersLoader} />
+        <Route path="login" element={<LoginPage />}  />
+        <Route path="signup" element={<SignupPage />}  />
       </Route>
       <Route element={<PrivateRoute />}>
         <Route path="employees" element={<AppShellLayout />}>
@@ -43,7 +42,7 @@ const router = createBrowserRouter(
         </Route>
         <Route path="user" element={<AppShellLayout />}>
           <Route element={<UserProfileLayout />}>
-            <Route path="settings" element={<ProfileSettingsPage/>} loader={UserDataLoader}/>
+            <Route path="settings" element={<ProfileSettingsPage/>}/>
           </Route>
         </Route>
       </Route>

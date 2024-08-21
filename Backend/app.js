@@ -73,6 +73,7 @@ app.use(express.json());
 
 // middleware for session
 app.use(session({
+  name:"sessionCookie",
   secret: process.env.SESSION_SECRET || 'supersecretkey',
   resave: false,
   saveUninitialized: false,
@@ -104,6 +105,7 @@ app.use("/api/auth",authRoute);
 app.use("/api/project",projectRoute);
 // app.use("/api/employee",isAuthenticated,employeetRoute);
 app.use("/api/employee",employeetRoute);
+
 app.use("/api/user",userRoute);
 
 serverStart();

@@ -1,20 +1,27 @@
 /* eslint-disable react/prop-types */
 
-import { AuthContext } from "@/context/AuthContext";
+// import { AuthContext } from "@/context/AuthContext";
 import { Box, Button, Container, Stack, Text, TextInput, Title} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useContext } from "react";
 import styles from "./styles.module.css";
 import axios from "axios";
+import { useEffect } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
-const ProfileContentPage=()=>{
-  const {user}=useContext(AuthContext);
+const ProfileContentPage=({user})=>{
+  const {setUser}=useContext(AuthContext);
+  useEffect(() => {
+    // console.log(user);
+  }, [user]);
+  // console.log(11,user);
+  // const {user}=useContext(AuthContext);
   const formProfile = useForm({
     initialValues: {
-      name: user.userName,
-      email: user.userEmail,
-      bio: "",
-      location: "",
+      name: user.username,
+      email: user.email,
+      bio: user.bio||"",
+      location: user.location||"",
     },
     validate: {
       name: (value) => (value.length > 2 ? null : "Invalid Name"),
@@ -27,19 +34,23 @@ const ProfileContentPage=()=>{
     
     const editUser={
       ...user,
-      name:values.name,
+      username:values.name,
       email:values.email,
       bio:values.bio,
       location:values.location
     }
     try {
-      const res=await axios.put(`http://localhost:5102/users/${user.userId}`,{
+      const res=await axios.put(`http://localhost:5000/api/user/users/${user._id}`,{
         ...editUser
       });
       // console.log(res);
       
       if(res.status===200){
         console.log("profile changed success");
+        console.log(res.data);
+        setUser({
+          ...res.data.user
+        })
       }else{
         console.log("error changing profile");
       }

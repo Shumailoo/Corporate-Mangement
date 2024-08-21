@@ -1,16 +1,16 @@
 import { Container, Text, Button, Group, PasswordInput, TextInput, Anchor, Divider, LoadingOverlay } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconAt, IconBrandFacebookFilled, IconBrandGoogleFilled, IconBrandX, IconLock } from "@tabler/icons-react";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "@/context/AuthContext";
 import { useContext } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import axios from "axios";
 
 function LoginPage() {
   const [visible, { open,close }] = useDisclosure(false);
   const {isAuthenticated,login}=useContext(AuthContext);
-  const { loadedUsers }=useLoaderData();
   const navigate=useNavigate();
   const form = useForm({
     validateInputOnChange: true,
@@ -24,28 +24,42 @@ function LoginPage() {
     },
   });
 
-  const handleSubmit=(values)=>{
+  const handleSubmit=async(values)=>{
     open();
-    if(!isAuthenticated){
-      const user=loadedUsers.find(user=>user.email===values.email && user.password===values.password);
-      if(!user){
-        notifications.show({
-          title:"Authentication Failed",
-          message:"We couldn't verify your account. Check your email and password and try again.",
-          autoClose:1800,
-        })
-        close();
-        form.reset();
-        return navigate("/login",{replace:true});
-      }
-      login({
-        userName:user.name,
-        userId:user.id,
-        userEmail:user.email,
-      })
-    }else{
-      alert('User already logged in');
+    const user={
+      email:values.email,
+      password:values.password,
     }
+    if(!isAuthenticated){
+      try {
+        const res=await axios.post("http://localhost:5000/api/auth/login",{...user});
+      console.log(res);
+      
+      if(res.status==200){
+        login({
+          username:res.data.user.username,
+          _id:res.data.user._id,
+          email:res.data.user.email,
+          bio:res.data.user.bio,
+          location:res.data.user.location,
+        })
+      } }catch (error) {
+        if(error.response.status==401){
+          notifications.show({
+            title:"Authentication Failed",
+            message:"We couldn't verify your account. Check your email and password and try again.",
+            autoClose:1800,
+          })
+          close();
+        form.reset();
+        return navigate("/login", { replace: true });
+      } else {
+        console.error(error);
+      }
+    }
+  } else {
+    console.log("User already logged in");
+  }
     notifications.show({
       title:"Welcome Back!",
       message:"We're delighted to see you again! You're all set to shine.",

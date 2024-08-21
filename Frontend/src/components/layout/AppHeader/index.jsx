@@ -7,6 +7,8 @@ import { IconBulb,IconKey, IconTrash } from "@tabler/icons-react";
 
 const CustomHeader = () => {
     let { user,logout } = useContext(AuthContext);
+    // console.log(user);
+    
     
     const navigate=useNavigate();
     return (
@@ -31,8 +33,8 @@ const CustomHeader = () => {
                 <Flex align={"center"} p={"4px 20px"} my={5} bg={"red.5"} c={"gray.0"} style={{ borderRadius: "20px" }}>
                     <Avatar mr={10} src="/src/assets/profile.png" alt="Account Avatar" size={50} radius="xl" ml={10} />
                     <Box>
-                        <Text fw={"bold"}>{user.userName}</Text>
-                        <Text fw={"normal"}>{user.userEmail}</Text>
+                        <Text fw={"bold"}>{user.username}</Text>
+                        <Text fw={"normal"}>{user.email}</Text>
                     </Box>
                 </Flex>
             </MenuTarget>

@@ -72,6 +72,8 @@ const ProjectFormPage = () => {
         totalSprintMeetings: values.totalSprintMeetings,
         employeeIds: values.employeeIds,
       };
+      console.log(project);
+      
       const req = await axios.post("http://localhost:5000/api/project/projects/", { ...project });
       if (req.status === 201) {
         console.log("project added");
