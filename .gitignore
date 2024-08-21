@@ -5,8 +5,10 @@
 */package-lock.json
 
 # IDE
-*/.vscode/*
-.vscode
+/.vscode/
+
+.gitignore
 
 # vite
 */vite.config.js
+/.vscode
