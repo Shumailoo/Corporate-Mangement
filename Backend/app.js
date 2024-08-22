@@ -104,7 +104,7 @@ app.use(session({
     collectionName: "sessions"
   }),
   cookie: {
-    maxAge: 1000 * 60 * 5, // 5 minutes
+    maxAge: 1000 * 60 * 10, // 10 minutes takes in milliseconds
     secure: false,
     sameSite: "strict",
   },
