@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useForm } from "@mantine/form";
-import axios from "axios";
+// import axios from "axios";
 import { useDisclosure } from "@mantine/hooks";
+import axiosInstance from "@/axiosInstance";
 
 const EmployeeFormPage = () => {
     const navigate = useNavigate();
@@ -56,7 +57,7 @@ const EmployeeFormPage = () => {
                 department: values.department,
                 location: values.location,
             };
-            const req = await axios.put("http://localhost:5000/api/employee/employees/" + employee.id, { ...employee });
+            const req = await axiosInstance.put("http://localhost:5000/api/employee/employees/" + employee.id, { ...employee });
             if (req.status === 200) {
                 console.log("edited employee success");
             } else {
@@ -73,7 +74,7 @@ const EmployeeFormPage = () => {
                 department: values.department,
                 location: values.location,
             };
-            const req = await axios.post("http://localhost:5000/api/employee/employees", { ...employee });
+            const req = await axiosInstance.post("http://localhost:5000/api/employee/employees", { ...employee });
             if (req.status === 201) {
                 console.log("Employee added");
             } else {

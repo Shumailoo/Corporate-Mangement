@@ -1,9 +1,10 @@
+import axiosInstance from "@/axiosInstance";
 import { Container, Text, Button, PasswordInput, TextInput, Anchor, LoadingOverlay } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconAt, IconLock, IconUser } from "@tabler/icons-react";
-import axios from "axios";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
@@ -28,7 +29,7 @@ function SignUpPage() {
   const handleSubmit=async (values)=>{
     open();
     try {
-      const res=await axios.post("http://localhost:5000/api/auth/register",{
+      const res=await axiosInstance.post("http://localhost:5000/api/auth/register",{
         username:values.name,
         email:values.email,
         password:values.password,
@@ -36,10 +37,11 @@ function SignUpPage() {
       if(res.status==201){
         console.log("new user created");
         close();
+        // console.log(res)
         notifications.show({
-          title:"User Created Successfully",
-          message:"You've taken the first step to an amazing journey! Log in now and explore!",
-          autoClose:1500,
+          title:res.data.messageTitle,
+          message:res.data.message,
+          autoClose:1800,
           color:"green"
         }) 
       }
@@ -48,10 +50,11 @@ function SignUpPage() {
         }, 1500);
     } catch (error) {
       if(error.response.status==409){
+        console.log(error.response)
         notifications.show({
-          title:"User Already Exists",
-          message:"These credentials are already associated with an account. Please use a different credentials.",
-          autoClose:1500,
+          title:error.response.data.messageTitle,
+          message:error.response.data.message,
+          autoClose:1800,
         })
       }
     }finally{

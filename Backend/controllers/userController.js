@@ -58,8 +58,8 @@ exports.editUserPassword=async(req,res)=>{
   const updates = req.body;
 
   let user=await User.findById(id);
-  console.log(1,user.password);
-  console.log(1,updates.password);
+  // console.log(1,user.password);
+  // console.log(1,updates.password);
   
   if (updates.password) {
     

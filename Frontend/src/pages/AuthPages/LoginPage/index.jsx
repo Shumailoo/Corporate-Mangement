@@ -3,10 +3,11 @@ import { useForm } from "@mantine/form";
 import { IconAt, IconBrandFacebookFilled, IconBrandGoogleFilled, IconBrandX, IconLock } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "@/context/AuthContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import axios from "axios";
+// import axios from "axios";
+import axiosInstance from "@/axiosInstance";
 
 function LoginPage() {
   const [visible, { open,close }] = useDisclosure(false);
@@ -24,6 +25,62 @@ function LoginPage() {
     },
   });
 
+  // useEffect(()=>{
+  //   const statusFetch=async()=>{
+  //     open();
+  //     try {
+  //       const statusRes=await axiosInstance.get("http://localhost:5000/api/auth/status");
+  //       if(statusRes.status==200){
+  //         login({
+  //           username:statusRes.data.user.username,
+  //           _id:statusRes.data.user._id,
+  //           email:statusRes.data.user.email,
+  //           bio:statusRes.data.user.bio,
+  //           location:statusRes.data.user.location,
+  //         })
+  //         close();
+  //         navigate("/employees",{replace:true});
+  //       }
+  //     } catch (error) {
+  //       if(error.response.status==401){
+  //         close();
+  //         return navigate("/login", { replace: true });
+  //       }
+  //     }
+  //   }
+  //   statusFetch();
+  // },[])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/employees", { replace: true });
+    } else {
+      const statusFetch = async () => {
+        open();
+        try {
+          const statusRes = await axiosInstance.get("http://localhost:5000/api/auth/status");
+          if (statusRes.status === 200) {
+            login({
+              username: statusRes.data.user.username,
+              _id: statusRes.data.user._id,
+              email: statusRes.data.user.email,
+              bio: statusRes.data.user.bio,
+              location: statusRes.data.user.location,
+            });
+            close();
+            navigate("/employees", { replace: true });
+          }
+        } catch (error) {
+          if (error.response?.status === 401) {
+            close();
+            return navigate("/login",{replace:true});
+          }
+        }
+      };
+      statusFetch();
+    }
+  }, []);
+
   const handleSubmit=async(values)=>{
     open();
     const user={
@@ -32,22 +89,31 @@ function LoginPage() {
     }
     if(!isAuthenticated){
       try {
-        const res=await axios.post("http://localhost:5000/api/auth/login",{...user});
-      console.log(res);
+        const res=await axiosInstance.post("http://localhost:5000/api/auth/login",{...user});
+        // console.log(res);
       
-      if(res.status==200){
-        login({
-          username:res.data.user.username,
-          _id:res.data.user._id,
-          email:res.data.user.email,
-          bio:res.data.user.bio,
-          location:res.data.user.location,
+        if(res.status==200){
+          login({
+            username:res.data.user.username,
+            _id:res.data.user._id,
+            email:res.data.user.email,
+            bio:res.data.user.bio,
+            location:res.data.user.location,
+          })
+        } 
+        notifications.show({
+          title:res.data.messageTitle,
+          message:res.data.message,
+          autoClose:1800,
+          color:"green"
         })
-      } }catch (error) {
+        // console.log(res);
+        
+      }catch (error) {
         if(error.response.status==401){
           notifications.show({
-            title:"Authentication Failed",
-            message:"We couldn't verify your account. Check your email and password and try again.",
+            title:error.response.data.messageTitle,
+            message:error.response.data.message,
             autoClose:1800,
           })
           close();
@@ -60,12 +126,7 @@ function LoginPage() {
   } else {
     console.log("User already logged in");
   }
-    notifications.show({
-      title:"Welcome Back!",
-      message:"We're delighted to see you again! You're all set to shine.",
-      autoClose:1800,
-      color:"green"
-    })
+    
     close();
     navigate("/employees",{replace:true});
   }

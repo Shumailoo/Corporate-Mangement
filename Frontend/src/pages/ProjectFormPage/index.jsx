@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams, useLoaderData } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useForm } from "@mantine/form";
-import axios from "axios";
+// import axios from "axios";
 import { useDisclosure } from "@mantine/hooks";
 import moment from "moment";
+import axiosInstance from "@/axiosInstance";
 
 const ProjectFormPage = () => {
   const [visible, { toggle }] = useDisclosure(false);
@@ -57,7 +58,7 @@ const ProjectFormPage = () => {
         totalSprintMeetings: values.totalSprintMeetings,
         employeeIds: values.employeeIds,
       };
-      const req = await axios.put("http://localhost:5000/api/project/projects/" + project._id, { ...project });
+      const req = await axiosInstance.put("http://localhost:5000/api/project/projects/" + project._id, { ...project });
       if (req.status === 200) {
         console.log("edited project success");
       } else {
@@ -74,7 +75,7 @@ const ProjectFormPage = () => {
       };
       console.log(project);
       
-      const req = await axios.post("http://localhost:5000/api/project/projects/", { ...project });
+      const req = await axiosInstance.post("http://localhost:5000/api/project/projects/", { ...project });
       if (req.status === 201) {
         console.log("project added");
       } else {
@@ -177,7 +178,7 @@ const ProjectFormPage = () => {
 export default ProjectFormPage;
 
 export const ProjectEmployeeLoader=async()=>{
-  const res=await axios.get("http://localhost:5000/api/employee/employees");
+  const res=await axiosInstance.get("http://localhost:5000/api/employee/employees");
   // console.log(res);
   
   if(res.status==200){

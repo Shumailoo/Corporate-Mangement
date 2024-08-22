@@ -5,9 +5,10 @@ import { Box, Button, Container, Stack, Text, TextInput, Title} from "@mantine/c
 import { useForm } from "@mantine/form";
 import { useContext } from "react";
 import styles from "./styles.module.css";
-import axios from "axios";
+// import axios from "axios";
 import { useEffect } from "react";
 import { AuthContext } from "@/context/AuthContext";
+import axiosInstance from "@/axiosInstance";
 
 const ProfileContentPage=({user})=>{
   const {setUser}=useContext(AuthContext);
@@ -40,7 +41,7 @@ const ProfileContentPage=({user})=>{
       location:values.location
     }
     try {
-      const res=await axios.put(`http://localhost:5000/api/user/users/${user._id}`,{
+      const res=await axiosInstance.put(`http://localhost:5000/api/user/users/${user._id}`,{
         ...editUser
       });
       // console.log(res);

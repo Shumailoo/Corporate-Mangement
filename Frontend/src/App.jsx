@@ -18,6 +18,9 @@ import { Notifications } from "@mantine/notifications";
 import UserProfileLayout from "@pages/UserProfile";
 // import ProfileContentPage from "@pages/UserProfile/ProfileContentPage";
 import ProfileSettingsPage from "@pages/UserProfile/ProfileSettingsPage";
+import ErrorPage from "@pages/ErrorPage";
+// import axiosInstance from "./axiosInstance";
+// import { useContext, useEffect } from "react";
 
 const theme = createTheme({
   fontFamily: "Open Sans, sans-serif",
@@ -31,6 +34,7 @@ const router = createBrowserRouter(
         <Route path="login" element={<LoginPage />}  />
         <Route path="signup" element={<SignupPage />}  />
       </Route>
+      <Route path="error" element={ErrorPage}/>
       <Route element={<PrivateRoute />}>
         <Route path="employees" element={<AppShellLayout />}>
           <Route index element={<ViewEmployeePage />} loader={EmployeeLoader} id="employees" />
@@ -46,6 +50,7 @@ const router = createBrowserRouter(
           </Route>
         </Route>
       </Route>
+      <Route path="*" element={<ErrorPage />} />
     </Route>
   )
 );

@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
-import { Button, Flex, Grid, Image, Modal, Text, Title } from "@mantine/core";
+import { Button, Flex, Grid, Image, List, Modal, Table, Text, ThemeIcon, Title } from "@mantine/core";
+import { IconPuzzleFilled } from "@tabler/icons-react";
 
 const ModalCustom=({ content, onDelete, onClose })=>{
     const size = content.type === "info" ? "xl" : "md";
@@ -75,26 +76,46 @@ const ModalCustom=({ content, onDelete, onClose })=>{
                                         {content.data.totalSprintMeetings}
                                     </Text>
                                 </Grid.Col>
-                                <Grid.Col span={1}>
+                                <Grid.Col span={2}>
                                     <Text size="18px" style={{ fontWeight: 700 }}>
                                         Deliverables:
                                     </Text>
                                 </Grid.Col>
-                                <Grid.Col span={1} c={"red.6"}>
-                                    <Text size="18px" style={{ fontWeight: 300 }}>
-                                        {content.data.deliverables}
-                                    </Text>
+                                <Grid.Col span={2} c={"red.6"}>
+                                    <List icon={
+                                        <ThemeIcon color="transparent">
+                                            <IconPuzzleFilled color="#f03e3e" />
+                                        </ThemeIcon>
+                                        }
+                                        pl={40} size="18px" style={{ fontWeight: 300 }}>
+                                        {content.data.deliverables.map((del,index)=>(
+                                            <List.Item c={"gray.8"} key={index}>{del}</List.Item>
+                                        ))}
+                                    </List>
                                 </Grid.Col>
-                                {/* <Grid.Col span={1}>
+                                <Grid.Col span={2}>
                                     <Text size="18px" style={{ fontWeight: 700 }}>
-                                        Employee IDs:
+                                        Employee:
                                     </Text>
                                 </Grid.Col>
-                                <Grid.Col span={1} c={"red.6"}>
-                                    <Text size="18px" style={{ fontWeight: 300 }}>
-                                        {content.data.employeeIds}
-                                    </Text>
-                                </Grid.Col> */}
+                                <Grid.Col span={2}>
+                                    <Table withRowBorders={false} striped>
+                                        <Table.Thead c={"red.6"}>
+                                            <Table.Tr>
+                                                <Table.Th>Name</Table.Th>
+                                                <Table.Th>Position</Table.Th>
+                                            </Table.Tr>
+                                        </Table.Thead>
+                                        <Table.Tbody c={"gray.8"}>
+                                            {content.data.employeeIds.map((employee,index)=>(
+                                                <Table.Tr key={index}>
+                                                    <Table.Td>{employee.name}</Table.Td>
+                                                    <Table.Td>{employee.position}</Table.Td>
+                                                </Table.Tr>
+                                            ))}
+                                        </Table.Tbody>
+                                    </Table>
+                                </Grid.Col>
                             </Grid>    
                         
                         </>

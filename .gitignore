@@ -1,5 +1,6 @@
 # modules
 */node_modules/*
+**/.env
 
 # package json
 */package-lock.json
@@ -12,3 +13,4 @@
 # vite
 */vite.config.js
 /.vscode
+

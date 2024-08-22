@@ -6,7 +6,8 @@ import { useForm } from "@mantine/form";
 import { IconLock } from "@tabler/icons-react";
 // import { useContext } from "react";
 import styles from "./styles.module.css";
-import axios from "axios";
+// import axios from "axios";
+import axiosInstance from "@/axiosInstance";
 
 const ProfileSettingsPage=({user})=>{
   
@@ -31,7 +32,7 @@ const ProfileSettingsPage=({user})=>{
       newPassword:values.newPassword,
     }
     try {
-      const res=await axios.put(`http://localhost:5000/api/user/users/${user._id}/password`,{
+      const res=await axiosInstance.put(`http://localhost:5000/api/user/users/${user._id}/password`,{
         ...editUser
       });
       // console.log(res);

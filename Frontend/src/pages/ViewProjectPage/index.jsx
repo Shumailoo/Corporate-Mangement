@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useLoaderData, useNavigate, useSearchParams } from "react-router-dom";
+import { redirect, useLoaderData, useNavigate, useSearchParams } from "react-router-dom";
 import { Title, Table, Button, Flex, Pagination, ActionIcon, LoadingOverlay } from "@mantine/core";
 import { IconEye, IconPencil, IconPlus, IconTrash } from "@tabler/icons-react";
-import axios from "axios";
+// import axios from "axios";
 import ModalCustom from "@/components/ModalCustom";
 import { useModal } from "@/customHooks/useModal";
 import { useDisclosure } from "@mantine/hooks";
+import axiosInstance from "@/axiosInstance";
 
 const tableHead = ["Serial#", "Project Name", "Description", "Estimated Delivery Date", "Total Sprint Meetings", "Actions"];
 
@@ -20,6 +21,11 @@ const ViewProjectPage = () => {
     const [activePage, setPage] = useState(parseInt(currentPage || searchParams.get("page") || 1));
     const itemsPerPage = Math.ceil(totalProducts/totalPages);
 
+    // useEffect(()=>{
+    //     const fetchStatus=async()=>{
+
+    //     }
+    // })
 
     useEffect(() => {
         setSearchParams({ page: activePage });
@@ -59,7 +65,7 @@ const ViewProjectPage = () => {
     const deleteProject=async (id)=>{
         open();
         try {
-            const res=await axios.delete(`http://localhost:5000/api/project/projects/${id}`);
+            const res=await axiosInstance.delete(`http://localhost:5000/api/project/projects/${id}`);
             if(res.status===200){
                 console.log("deleted project success");
             }
@@ -145,18 +151,25 @@ export default ViewProjectPage;
 export const ProjectLoader=async({request})=>{
     const url = new URL(request.url);
     const page = url.searchParams.get("page") || 1;
-    const res=await axios.get(`http://localhost:5000/api/project/projects?page=${page}`);
-    console.log(res);
-    
-    if(res.status===200){
-        return {
-            loadedProjects: res.data.projects,
-            totalProducts: res.data.totalProjects,
-            totalPages:res.data.totalPages,
-            currentPage:res.data.currentPage,
-        };
-    }
-    else{
-        console.log("error fetch project");
+    // const navigate=useNavigate();
+    try {
+        const res=await axiosInstance.get(`http://localhost:5000/api/project/projects?page=${page}`);
+        // console.log(res);
+        
+        if(res.status===200){
+            return {
+                loadedProjects: res.data.projects,
+                totalProducts: res.data.totalProjects,
+                totalPages:res.data.totalPages,
+                currentPage:res.data.currentPage,
+            };
+        }
+    } catch (error) {
+        if(error.response.status==401){
+            console.log("error fetch project");
+            return redirect("/login");
+            // navigate("/login",{replace:true});
+        }
+        
     }
 }

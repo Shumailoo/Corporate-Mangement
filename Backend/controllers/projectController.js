@@ -2,7 +2,7 @@ const Project = require('../models/Project'); // Assuming your Project model is 
 
 // Get all projects with pagination
 exports.getProjects = async (req, res) => {
-  console.log(req.cookies);
+  // console.log(req.session);
   
   const currentPage = req.query.page || 1;
   const pageSize = 2;
@@ -47,7 +47,7 @@ exports.getProject = async (req, res) => {
 
 // Add a new project
 exports.addProject = async (req, res) => {
-  console.log(12,req.body);
+  // console.log(12,req.body);
   
   try {
     const projectName=req.body.projectName;

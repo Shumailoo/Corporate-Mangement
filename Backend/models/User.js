@@ -31,7 +31,7 @@ userSchema.pre("save", async function (next) {
     // Hash the password with a salt rounds value of 12
     const hashedPassword = await bcrypt.hash(this.password, 12);
     this.password = hashedPassword;
-    console.log(this.password);
+    // console.log(this.password);
     
     next();
   } catch (err) {
